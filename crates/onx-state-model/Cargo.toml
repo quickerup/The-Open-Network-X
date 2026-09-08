@@ -1,0 +1,9 @@
+[package]
+name = "onx-state-model"
+version = "0.1.0"
+edition = "2021"
+description = "State model, account lifecycle, cell graph (BoC), and Merkle tree structures for Open Network X"
+
+[dependencies]
+onx-primitives = { path = "../onx-primitives" }
+onx-data-structures = { path = "../onx-data-structures" }

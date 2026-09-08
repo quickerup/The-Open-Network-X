@@ -38,6 +38,10 @@ don't duplicate the work.
 - Added `crates/onx-data-structures` implementing `docs/specification/data-structures.md`
   in full: workchain identifiers, account IDs, full addresses, ShardIdent bitwise prefix encoding,
   message structures, and block headers with domain-separated SHA-256 hashing.
+- Added `crates/onx-state-model` implementing `docs/specification/state-model.md`
+  in full: account lifecycle state machine, account state records, cell trees,
+  domain-separated cell hashing (`ONX_CELL_HASH_V1`), Bag-of-Cells (BoC) graph serialization,
+  DAG cycle validation, shard state trees, and Merkle proofs.
 - Added `.github/workflows/ci.yml` running `cargo fmt`, `cargo clippy`, `cargo build`,
   and `cargo test` on pull requests.
 - Reformatted `README.md` with proper Markdown structure and updated status diagram.
@@ -51,7 +55,7 @@ Ordered by priority — earlier items unblock more of what follows.
 
 ### Now (unblocks the most)
 
-- [ ] **Implement `docs/specification/state-model.md` in code.**
+- [x] ~~**Implement `docs/specification/state-model.md` in code.**~~
       A crate for the account state record layout, cell binary serialization,
       domain-separated cell hashing, and Merkle proof structures. Depends on
       `onx-primitives` and `onx-data-structures`.
