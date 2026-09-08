@@ -3,4 +3,5 @@ resolver = "2"
 members = [
     "crates/onx-primitives",
     "crates/onx-data-structures",
+    "crates/onx-state-model",
 ]

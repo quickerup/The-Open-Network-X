@@ -51,10 +51,9 @@ Ordered by priority — earlier items unblock more of what follows.
 
 ### Now (unblocks the most)
 
-- [ ] **Implement `docs/specification/state-model.md` in code.**
+- [x] **Implement `docs/specification/state-model.md` in code.**
       A crate for the account state record layout, cell binary serialization,
-      domain-separated cell hashing, and Merkle proof structures. Depends on
-      `onx-primitives` and `onx-data-structures`.
+      domain-separated cell hashing, and Merkle proof structures (`onx-state-model`).
 - [ ] **Write the Transactions and Messages specification**
       (`docs/specification/transactions.md` + ADR). This is the next
       unwritten item in the architecture's specification sequence
