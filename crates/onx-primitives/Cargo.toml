@@ -8,7 +8,7 @@ publish = false
 
 [dependencies]
 sha2 = "0.10"
-ed25519-dalek = { version = "2", features = ["rand_core"] }
+ed25519-dalek = { version = "3", features = ["rand_core"] }
 
 [dev-dependencies]
 hex = "0.4"
