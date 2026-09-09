@@ -1,38 +1,46 @@
-# ADR-0010 — Networking Dht
+# ADR-0010 — Networking: Distributed Hash Table (DHT)
 
 **Status:** Accepted  
 **Date:** 2026-09-09
 
 ## Context
 
-Architecture sequence work requires this protocol layer to be explicit before implementation. The historical reference supplies mechanisms, but not a complete ONX implementation contract.
+Architecture sequence item 8 (Networking) requires peer and service discovery mechanisms to be specified independently of transport and consensus layers.
 
 ## Reference
 
-See `docs/specification/networking-dht.md` §1 and its cited `whitepaper.md` subsections.
+- `whitepaper.md` §3.2 (TON DHT: Kademlia-like Distributed Hash Table, §3.2.1–§3.2.12).
+- `docs/specification/networking-dht.md` (DHT specification).
+- `docs/specification/networking-adnl.md` (ADNL transport specification).
 
 ## Problem
 
-Without a separately reviewable decision, a future implementation could silently inherit undefined behavior from another system or confuse transport, consensus, and economic policy.
+Peer and service discovery in ONX needs to be decentralized, resistant to key retention and eclipse attacks, and strictly decoupled from consensus validity so that untrusted or poisoned discovery entries cannot compromise block verification or validator set management.
 
 ## Decision
 
-Accept `docs/specification/networking-dht.md` as ONX's draft specification for this layer. Its ONX interpretations are intentional: values and wire layouts not fully supported by the reference are documented as adaptations or deferrals, and no implementation is authorized beyond the document's stated dependencies.
+Accept `docs/specification/networking-dht.md` as ONX's specification for peer and service discovery:
+1. Organizing nodes into a Kademlia XOR metric space with 256 $k$-buckets ($k=20$).
+2. Defining four canonical, signed record types (Node Contact, Tunnel Entry, Service Registration, Account Pointer) with explicit expiration lifetimes (max 24h).
+3. Adopting `extra_id` counter fall-back keys to defeat key retention and eclipse attacks (§3.2.11).
+4. Establishing a strict non-consensus boundary: DHT records provide advisory transport routes only and never influence block validity or validator state.
 
 ## Alternatives Considered
 
-1. Copy an existing implementation's behavior: rejected because ONX is independently specified.
-2. Leave this layer implicit: rejected because it would make consensus-relevant behavior unauditable.
-3. Specify only the reference prose: rejected because ONX needs deterministic malformed-input and test requirements.
+1. **Centralized bootstrap seeds:** simpler to implement, but introduces single-point-of-failure censorship risks.
+2. **Conflating DHT discovery with Consensus:** allows nodes to discover validators via DHT, but risks BFT safety if DHT entries are spoofed or eclipsed.
+3. **Implicit reference copying:** leaves wire formats and rejection rules unspecified, leading to incompatible node implementations.
 
 ## Consequences
 
-The layer has a stable review target and no production code is added. Future code must implement the whole specified structure and its negative tests; it must not treat this ADR as permission to fill deferred details ad hoc.
+- The ONX DHT specification defines exact TL constructor tags, big-endian binary layouts, and signature verification rules.
+- Discovery data remains strictly advisory.
+- Implementation of the DHT component in Rust can proceed independently once the ADNL transport layer is built.
 
 ## Implementation
 
-Documentation only. See the specification's dependency and serialization sections before any crate is created.
+Documentation and specification complete. Implementation will be placed in the networking crate.
 
 ## Tests
 
-See `docs/specification/networking-dht.md` §6 for the required future test plan.
+See `docs/specification/networking-dht.md` §6 for the complete test plan (XOR distance invariants, lookup convergence, fall-back key failover, signature verification, and adversarial input rejection).

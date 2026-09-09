@@ -45,14 +45,18 @@ proptest! {
     #[test]
     fn rejects_oversized_data(extra in 129u8..=255) {
         let bytes = vec![0, extra];
-        prop_assert!(matches!(Cell::from_bytes(&bytes), Err(StateModelError::DataTooLarge { .. })));
+        let res = Cell::from_bytes(&bytes);
+        let is_oversized = matches!(res, Err(StateModelError::DataTooLarge { .. }));
+        prop_assert!(is_oversized);
     }
 
     /// §5: descriptors with more than four references are rejected.
     #[test]
     fn rejects_too_many_references(count in 5u8..=7) {
         let bytes = vec![count, 0];
-        prop_assert!(matches!(Cell::from_bytes(&bytes), Err(StateModelError::TooManyReferences { .. })));
+        let res = Cell::from_bytes(&bytes);
+        let is_too_many = matches!(res, Err(StateModelError::TooManyReferences { .. }));
+        prop_assert!(is_too_many);
     }
 
     /// §5: a generated self-reference in a BoC is rejected (before it can become a DAG).

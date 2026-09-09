@@ -84,13 +84,7 @@ The TON Blockchain is actually a collection of blockchains (even a collection of
 
    - Several (up to 2<sup>32</sup> ) working blockchains, or workchains for short, which are actually the “workhorses”, containing the value-transfer and smartcontract transactions. Different workchains may have different “rules”, meaning different formats of account addresses, different formats of transactions, different virtual machines (VMs) for smart contracts, different basic cryptocurrencies and so on. However, they all must satisfy certain basic interoperability criteria to make interaction between different workchains possible and relatively simple. In this respect, the TON Blockchain is heterogeneous (cf. 2.8.8), similarly to the EOS (cf. 2.9.7) and PolkaDot (cf. 2.9.8) projects. 
 
-   - Each workchain is in turn subdivided into up to 2<sup>60</sup> shard blockchains, or shardchains for short, having the same rules and block format as 
-
-5 
-
-2.1. TON Blockchain as a Collection of 2-Blockchains 
-
-the workchain itself, but responsible only for a subset of accounts, depending on several first (most significant) bits of the account address. In other words, a form of sharding is built into the system (cf. 2.8.12). Because all these shardchains share a common block format and rules, the TON Blockchain is homogeneous in this respect (cf. 2.8.8), similarly to what has been discussed in one of Ethereum scaling proposals.<sup>1</sup> 
+   - Each workchain is in turn subdivided into up to 2<sup>60</sup> shard blockchains, or shardchains for short, having the same rules and block format as the workchain itself, but responsible only for a subset of accounts, depending on several first (most significant) bits of the account address. In other words, a form of sharding is built into the system (cf. 2.8.12). Because all these shardchains share a common block format and rules, the TON Blockchain is homogeneous in this respect (cf. 2.8.8), similarly to what has been discussed in one of Ethereum scaling proposals.<sup>1</sup>
 
 - Each block in a shardchain (and in the masterchain) is actually not just a block, but a small blockchain. Normally, this “block blockchain” or “vertical blockchain” consists of exactly one block, and then we might think this is just the corresponding block of the shardchain (also called “horizontal blockchain” in this situation). However, if it becomes necessary to fix incorrect shardchain blocks, a new block is committed into the “vertical blockchain”, containing either the replacement for the invalid “horizontal blockchain” block, or a “block difference”, containing only a description of those parts of the previous version of this block that need to be changed. This is a TON-specific mechanism to replace detected invalid blocks without making a true fork of all shardchains involved; it will be explained in more detail in 2.1.17. For now, we just remark that each shardchain (and the masterchain) is not a conventional blockchain, but a blockchain of blockchains, or 2D-blockchain, or just a 2-blockchain. 
 
@@ -100,13 +94,7 @@ The TON approach to sharding is “bottom-up”, explained as follows. Imagine t
 
 Of course, it is impractical to have hundreds of millions of blockchains, with updates (i.e., new blocks) usually appearing quite rarely in each of them. In order to implement them more efficiently, we group these “accountchains” into “shardchains”, so that each block of the shardchain is essentially a 
 
-1https://github.com/ethereum/wiki/wiki/Sharding-FAQ 
-
-6 
-
-2.1. TON Blockchain as a Collection of 2-Blockchains 
-
-collection of blocks of account-chains that have been assigned to this shard. Thus the “account-chains” have only a purely virtual or logical existence inside the “shardchains”. 
+1https://github.com/ethereum/wiki/wiki/Sharding-FAQ collection of blocks of account-chains that have been assigned to this shard. Thus the “account-chains” have only a purely virtual or logical existence inside the “shardchains”.
 
 We call this perspective the Infinite Sharding Paradigm. It explains many of the design decisions for the TON Blockchain. 
 
@@ -116,13 +104,7 @@ We call this perspective the Infinite Sharding Paradigm. It explains many of the
 
 2.1.5. Workchains can be virtual blockchains, not true blockchains. Because a workchain is usually subdivided into shardchains, the existence of the workchain is “virtual”, meaning that it is not a true blockchain in the sense of the general definition provided in 2.2.1 below, but just a collection of shardchains. When only one shardchain corresponds to a workchain, this unique shardchain may be identified with the workchain, which in this case becomes a “true” blockchain, at least for some time, thus gaining a superficial similarity to customary single-blockchain design. However, the Infinite Sharding Paradigm (cf. 2.1.2) tells us that this similarity is indeed superficial: it is just a coincidence that the potentially huge number of “accountchains” can temporarily be grouped into one blockchain. 
 
-2.1.6. Identification of workchains. Each workchain is identified by its number or workchain identifier (workchain_id : uint 32 ), which is simply an 
-
-7 
-
-2.1. TON Blockchain as a Collection of 2-Blockchains 
-
-unsigned 32-bit integer. Workchains are created by special transactions in the masterchain, defining the (previously unused) workchain identifier and the formal description of the workchain, sufficient at least for the interaction of this workchain with other workchains and for superficial verification of this workchain's blocks. 
+2.1.6. Identification of workchains. Each workchain is identified by its number or workchain identifier (workchain_id : uint 32 ), which is simply an unsigned 32-bit integer. Workchains are created by special transactions in the masterchain, defining the (previously unused) workchain identifier and the formal description of the workchain, sufficient at least for the interaction of this workchain with other workchains and for superficial verification of this workchain's blocks.
 
 2.1.7. Creation and activation of new workchains. The creation of a new workchain may be initiated by essentially any member of the community, ready to pay the (high) masterchain transaction fees required to publish the formal specification of a new workchain. However, in order for the new workchain to become active, a two-thirds consensus of validators is required, because they will need to upgrade their software to process blocks of the new workchain, and signal their readiness to work with the new workchain by special masterchain transactions. The party interested in the activation of the new workchain might provide some incentive for the validators to support the new workchain by means of some rewards distributed by a smart contract. 
 
@@ -132,13 +114,7 @@ unsigned 32-bit integer. Workchains are created by special transactions in the m
 
 2.1.10. Dynamic splitting and merging of shardchains; cf. 2.7. A less sophisticated system might use static sharding—for example, by using the top eight bits of the account_id to select one of 256 pre-defined shards. 
 
-An important feature of the TON Blockchain is that it implements dynamic sharding, meaning that the number of shards is not fixed. Instead, shard ( _w, s_ ) can be automatically subdivided into shards ( _w, s._ 0) and ( _w, s._ 1) if some formal conditions are met (essentially, if the transaction load on the original shard is high enough for a prolonged period of time). Conversely, 
-
-8 
-
-2.1. TON Blockchain as a Collection of 2-Blockchains 
-
-if the load stays too low for some period of time, the shards ( _w, s._ 0) and ( _w, s._ 1) can be automatically merged back into shard ( _w, s_ ) . 
+An important feature of the TON Blockchain is that it implements dynamic sharding, meaning that the number of shards is not fixed. Instead, shard ( _w, s_ ) can be automatically subdivided into shards ( _w, s._ 0) and ( _w, s._ 1) if some formal conditions are met (essentially, if the transaction load on the original shard is high enough for a prolonged period of time). Conversely, if the load stays too low for some period of time, the shards ( _w, s._ 0) and ( _w, s._ 1) can be automatically merged back into shard ( _w, s_ ) .
 
 Initially, only one shard ( _w, ∅_ ) is created for workchain _w_ . Later, it is subdivided into more shards, if and when this becomes necessary (cf. 2.7.6 and 2.7.8). 
 
@@ -176,13 +152,7 @@ We expect masterchain forks to be rare, next to non-existent, because in the BFT
 
 Of course, once an invalid shardchain block is found—either by a validator (not necessarily assigned to this shardchain) or by a “fisherman” (any node of the system that made a certain deposit to be able to raise questions about block validity; cf. 2.6.4)—the invalidity claim and its proof are committed into the masterchain, and the validators that have signed the invalid block are punished by losing part of their stake and/or being temporarily suspended from the set of validators (the latter measure is important for the case of an attacker stealing the private signing keys of an otherwise benign validator). 
 
-However, this is not sufficient, because the overall state of the system (TON Blockchain) turns out to be invalid because of the invalid shardchain block previously committed. This invalid block must be replaced by a newer 
-
-11 
-
-2.1. TON Blockchain as a Collection of 2-Blockchains 
-
-valid version. 
+However, this is not sufficient, because the overall state of the system (TON Blockchain) turns out to be invalid because of the invalid shardchain block previously committed. This invalid block must be replaced by a newer valid version.
 
 Most systems would achieve this by “rolling back” to the last block before the invalid one in this shardchain and the last blocks unaffected by messages propagated from the invalid block in each of the other shardchains, and creating a new fork from these blocks. This approach has the disadvantage that a large number of otherwise correct and committed transactions are suddenly rolled back, and it is unclear whether they will be included later at all. 
 
@@ -192,13 +162,7 @@ The rules for a new “vertical” block to be valid are quite strict. In partic
 
 Once a new “vertical” block is committed on top of the invalid block, its hash is published in a new masterchain block (or rather in a new “vertical” block, lying above the original masterchain block where the hash of the invalid shardchain block was originally published), and the changes are propagated further to any shardchain blocks referring to the previous version of this block (e.g., those having received messages from the incorrect block). This is fixed by committing new “vertical” blocks in vertical blockchains for all blocks previously referring to the “incorrect” block; new vertical blocks will refer to the most recent (corrected) versions instead. Again, strict rules forbid changing account-chains that are not really affected (i.e., that receive the same messages as in the previous version). In this way, fixing an incorrect block generates “ripples” that are ultimately propagated towards the most recent blocks of all affected shardchains; these changes are reflected in new “vertical” masterchain blocks as well. 
 
-Once the “history rewriting” ripples reach the most recent blocks, the new shardchain blocks are generated in one version only, being successors of the newest block versions only. This means that they will contain references to 
-
-12 
-
-2.1. TON Blockchain as a Collection of 2-Blockchains 
-
-the correct (most recent) vertical blocks from the very beginning. 
+Once the “history rewriting” ripples reach the most recent blocks, the new shardchain blocks are generated in one version only, being successors of the newest block versions only. This means that they will contain references to the correct (most recent) vertical blocks from the very beginning.
 
 The masterchain state implicitly defines a map transforming the hash of the first block of each “vertical” blockchain into the hash of its latest version. This enables a client to identify and locate any vertical blockchain by the hash of its very first (and usually the only) block. 
 
@@ -214,13 +178,7 @@ The simplest form of such messaging is a value transfer from one (usually not a 
 
 2.1.20. TON Virtual Machine. The TON Virtual Machine, also abbreviated as TON VM or TVM , is the virtual machine used to execute smart-contract code in the masterchain and in the basic workchain. Other workchains may use other virtual machines alongside or instead of the TVM. Here we list some of its features. They are discussed further in 2.3.12, 2.3.14 and elsewhere. 
 
-- TVM represents all data as a collection of (TVM) cells (cf. 2.3.14). Each cell contains up to 128 data bytes and up to 4 references to other cells. As a consequence of the “everything is a bag of cells” philosophy 
-
-13 
-
-2.1. TON Blockchain as a Collection of 2-Blockchains 
-
-   - (cf. 2.5.14), this enables TVM to work with all data related to the TON Blockchain, including blocks and blockchain global state if necessary. 
+- TVM represents all data as a collection of (TVM) cells (cf. 2.3.14). Each cell contains up to 128 data bytes and up to 4 references to other cells. As a consequence of the “everything is a bag of cells” philosophy - (cf. 2.5.14), this enables TVM to work with all data related to the TON Blockchain, including blocks and blockchain global state if necessary.
 
 - TVM can work with values of arbitrary algebraic data types (cf. 2.3.12), represented as trees or directed acyclic graphs of TVM cells. However, it is agnostic towards the existence of algebraic data types; it just works with cells. 
 
@@ -290,13 +248,7 @@ TL is a language suitable for description of dependent algebraic types, which ar
 
 > 3https://coq.inria.fr 
 
-> 4https://core.telegram.org/mtproto/TL 
-
-16 
-
-2.2. Generalities on Blockchains 
-
-A collection of constructor and type definitions is called a TL-scheme. It is usually kept in one or several files with the suffix .tl. 
+> 4https://core.telegram.org/mtproto/TL A collection of constructor and type definitions is called a TL-scheme. It is usually kept in one or several files with the suffix .tl.
 
 An important feature of TL-schemes is that they determine an unambiguous way of serializing and deserializing values (or objects) of algebraic types defined. Namely, when a value needs to be serialized into a stream of bytes, first the name of the constructor used for this value is serialized. Recursively computed serializations of each field follow. 
 
@@ -318,13 +270,7 @@ Because a block is essentially a list of transactions, the block evaluation func
 
 
 
-can be derived from ev_trans. It takes a block _B_ : Block and the previous blockchain state _s_ : State (which might include the hash of the previous 
-
-17 
-
-2.2. Generalities on Blockchains 
-
-block) and computes the next blockchain state _s_<sup>_′_</sup> = ev_block ( _B_ )( _s_ ) : State, which is either a true state or a special value _⊥_ indicating that the next state cannot be computed (i.e., that the block is invalid if evaluated from the starting state given—for example, the block includes a transaction trying to debit an empty account.) 
+can be derived from ev_trans. It takes a block _B_ : Block and the previous blockchain state _s_ : State (which might include the hash of the previous block) and computes the next blockchain state _s_<sup>_′_</sup> = ev_block ( _B_ )( _s_ ) : State, which is either a true state or a special value _⊥_ indicating that the next state cannot be computed (i.e., that the block is invalid if evaluated from the starting state given—for example, the block includes a transaction trying to debit an empty account.)
 
 2.2.7. Block sequence numbers. Each block _B_ in the blockchain can be referred to by its sequence number blk-seqno ( _B_ ) , starting from zero for the very first block, and incremented by one whenever passing to the next block. More formally, 
 
@@ -344,13 +290,7 @@ Of course, (7) is impossible mathematically, because a map from an infinite set 
 
 
 
-However, this is not so convenient for the proofs. If (8) is used at most _N_ times in a proof with 2<sup>_−k_</sup> _N < ϵ_ for some small _ϵ_ (say, _ϵ_ = 10<sup>_−_18</sup> ), we can 
-
-18 
-
-2.3. Blockchain State, Accounts and Hashmaps 
-
-reason as if (7) were true, provided we accept a failure probability _ϵ_ (i.e., the final conclusions will be true with probability at least 1 _− ϵ_ ). 
+However, this is not so convenient for the proofs. If (8) is used at most _N_ times in a proof with 2<sup>_−k_</sup> _N < ϵ_ for some small _ϵ_ (say, _ϵ_ = 10<sup>_−_18</sup> ), we can reason as if (7) were true, provided we accept a failure probability _ϵ_ (i.e., the final conclusions will be true with probability at least 1 _− ϵ_ ).
 
 Final remark: in order to make the probability statement of (8) really rigorous, one must introduce a probability distribution on the set Bytes<sup>_∗_</sup> of all byte sequences. A way of doing this is by assuming all byte sequences of the same length _l_ equiprobable, and setting the probability of observing a sequence of length _l_ equal to _p_<sup>_l_</sup> _− p_<sup>_l_+1</sup> for some _p →_ 1 _−_ . Then (8) should be understood as a limit of conditional probability _P_ � Hash ( _s_ ) = Hash ( _s_<sup>_′_</sup> ) _|s_ = _s_<sup>_′_�</sup> when _p_ tends to one from below. 
 
@@ -398,13 +338,7 @@ mapping account_id of a smart contract into its persistent storage.
 
 corresponding to a data structure encoding a (partial) map **2**<sup>_n_</sup> ��� _X_ . We can also write 
 
-
-
-20 
-
-2.3. Blockchain State, Accounts and Hashmaps 
-
-or 
+ or
 
 
 
@@ -470,13 +404,7 @@ One might imagine first that the state of a TVM smart contract is not just a has
 
 In fact, values do not need to be precisely 256-bit. The value format used by TVM consists of a sequence of raw bytes and references to other structures, mixed in arbitrary order, with some descriptor bytes inserted in suitable locations to be able to distinguish pointers from raw data (e.g., strings or integers); cf. 2.3.14. 
 
-This raw value format may be used to implement arbitrary sum-product algebraic types. In this case, the value would contain a raw byte first, describing the “constructor” being used (from the perspective of a high-level 
-
-24 
-
-2.3. Blockchain State, Accounts and Hashmaps 
-
-language), and then other “fields” or “constructor arguments”, consisting of raw bytes and references to other structures depending on the constructor chosen (cf. 2.2.5). However, TVM does not know anything about the correspondence between constructors and their arguments; the mixture of bytes and references is explicitly described by certain descriptor bytes.<sup>8</sup> 
+This raw value format may be used to implement arbitrary sum-product algebraic types. In this case, the value would contain a raw byte first, describing the “constructor” being used (from the perspective of a high-level language), and then other “fields” or “constructor arguments”, consisting of raw bytes and references to other structures depending on the constructor chosen (cf. 2.2.5). However, TVM does not know anything about the correspondence between constructors and their arguments; the mixture of bytes and references is explicitly described by certain descriptor bytes.<sup>8</sup>
 
 The Merkle tree hashing is extended to arbitrary such structures: to compute the hash of such a structure, all references are recursively replaced by hashes of objects referred to, and then the hash of the resulting byte string (descriptor bytes included) is computed. 
 
@@ -492,13 +420,7 @@ In this way, the persistent data storage cells of a TON smart contract are organ
 
 > 9Actually, Leaf and Node are constructors of an auxiliary type, HashmapAux ( _n, X_ ) . Type Hashmap ( _n, X_ ) has constructors Root and EmptyRoot, with Root containing a value of type HashmapAux ( _n, X_ ) . 
 
-> 10Logically; the “bag of cells” representation described in 2.5.5 identifies all duplicate 
-
-25 
-
-2.3. Blockchain State, Accounts and Hashmaps 
-
-the smart-contract description. If necessary, a Merkle tree hash of this entire persistent storage is recursively computed, starting from the leaves and then simply replacing all references in a cell with the recursively computed hashes of the referenced cells, and subsequently computing the hash of the byte string thus obtained. 
+> 10Logically; the “bag of cells” representation described in 2.5.5 identifies all duplicate the smart-contract description. If necessary, a Merkle tree hash of this entire persistent storage is recursively computed, starting from the leaves and then simply replacing all references in a cell with the recursively computed hashes of the referenced cells, and subsequently computing the hash of the byte string thus obtained.
 
 2.3.15. Generalized Merkle proofs for values of arbitrary algebraic types. Because the TON VM represents a value of arbitrary algebraic type by means of a tree consisting of (TVM) cells, and each cell has a well-defined (recursively computed) Merkle hash, depending in fact on the whole subtree rooted in this cell, we can provide “generalized Merkle proofs” for (parts of) values of arbitrary algebraic types, intended to prove that a certain subtree of a tree with a known Merkle hash takes a specific value or a value with a specific hash. This generalizes the approach of 2.3.10, where only Merkle proofs for _x_ [ _i_ ] = _y_ have been considered. 
 
@@ -576,13 +498,7 @@ Notice that the Actor model does not require the messages to have an implicit se
 
 Notice that “simple” value transfers between “simple” accounts are just empty (no-op) messages with some value attached to them. On the other hand, a slightly more complicated message body might contain a simple text or binary comment (e.g., about the purpose of the payment). 
 
-2.4.6. External messages, or “messages from nowhere”. Some messages arrive into the system “from nowhere”—that is, they are not generated by an account (smart contract or not) residing in the blockchain. The most 
-
-30 
-
-2.4. Messages Between Shardchains 
-
-typical example arises when a user wants to transfer some funds from an account controlled by her to some other account. In this case, the user sends a “message from nowhere” to her own account, requesting it to generate a message to the receiving account, carrying the specified value. If this message is correctly signed, her account receives it and generates the required outbound messages. 
+2.4.6. External messages, or “messages from nowhere”. Some messages arrive into the system “from nowhere”—that is, they are not generated by an account (smart contract or not) residing in the blockchain. The most typical example arises when a user wants to transfer some funds from an account controlled by her to some other account. In this case, the user sends a “message from nowhere” to her own account, requesting it to generate a message to the receiving account, carrying the specified value. If this message is correctly signed, her account receives it and generates the required outbound messages.
 
 In fact, one might consider a “simple” account as a special case of a smart contract with predefined code. This smart contract receives only one type of message. Such an inbound message must contain a list of outbound messages to be generated as a result of delivering (processing) the inbound message, along with a signature. The smart contract checks the signature, and, if it is correct, generates the required messages. 
 
@@ -592,13 +508,7 @@ In this sense, “messages from nowhere” or “external messages” take the r
 
 2.4.7. Log messages, or “messages to nowhere”. Similarly, sometimes a special message can be generated and routed to a specific shardchain not to be delivered to its recipient, but to be logged in order to be easily observable by anybody receiving updates about the shard in question. These logged messages may be output in a user's console, or trigger an execution of some script on an off-chain server. In this sense, they represent the external “output” of the “blockchain supercomputer”, just as the “messages from nowhere” represent the external “input” of the “blockchain supercomputer”. 
 
-2.4.8. Interaction with off-chain services and external blockchains. These external input and output messages can be used for interacting with 
-
-31 
-
-2.4. Messages Between Shardchains 
-
-off-chain services and other (external) blockchains, such as Bitcoin or Ethereum. One might create tokens or cryptocurrencies inside the TON Blockchain pegged to Bitcoins, Ethers or any ERC-20 tokens defined in the Ethereum blockchain, and use “messages from nowhere” and “messages to nowhere”, generated and processed by scripts residing on some third-party off-chain servers, to implement the necessary interaction between the TON Blockchain and these external blockchains. 
+2.4.8. Interaction with off-chain services and external blockchains. These external input and output messages can be used for interacting with off-chain services and other (external) blockchains, such as Bitcoin or Ethereum. One might create tokens or cryptocurrencies inside the TON Blockchain pegged to Bitcoins, Ethers or any ERC-20 tokens defined in the Ethereum blockchain, and use “messages from nowhere” and “messages to nowhere”, generated and processed by scripts residing on some third-party off-chain servers, to implement the necessary interaction between the TON Blockchain and these external blockchains.
 
 2.4.9. Message body. The message body is simply a sequence of bytes, the meaning of which is determined only by the receiving workchain and/or smart contract. For blockchains using TON VM, this could be the serialization of any TVM cell, generated automatically via the Send() operation. Such a serialization is obtained simply by recursively replacing all references in a TON VM cell with the cells referred to. Ultimately, a string of raw bytes appears, which is usually prepended by a 4-byte “message type” or “message constructor”, used to select the correct method of the receiving smart contract. 
 
@@ -670,13 +580,7 @@ Therefore, both message forwarding methods are run in parallel, and the “slow�
 
 2.4.26. Messages to and from the masterchain. Messages can be sent directly from any shardchain to the masterchain, and vice versa. However, gas prices for sending messages to and for processing messages in the masterchain are quite high, so this ability will be used only when truly necessary— for example, by the validators to deposit their stakes. In some cases, a minimal deposit (attached value) for messages sent to the masterchain may be defined, which is returned only if the message is deemed “valid” by the receiving party. 
 
-Messages cannot be automatically routed through the masterchain. A message with workchain_id = _−_ 1 ( _−_ 1 being the special workchain_id indi- 
-
-37 
-
-2.5. Global Shardchain State. “Bag of Cells” Philosophy. 
-
-cating the masterchain) cannot be delivered to the masterchain. In principle, one can create a message-forwarding smart contract inside the masterchain, but the price of using it would be prohibitive. 
+Messages cannot be automatically routed through the masterchain. A message with workchain_id = _−_ 1 ( _−_ 1 being the special workchain_id indicating the masterchain) cannot be delivered to the masterchain. In principle, one can create a message-forwarding smart contract inside the masterchain, but the price of using it would be prohibitive.
 
 2.4.27. Messages between accounts in the same shardchain. In some cases, a message is generated by an account belonging to some shardchain, destined to another account in the same shardchain. For example, this happens in a new workchain which has not yet split into several shardchains because the load is manageable. 
 
@@ -710,13 +614,7 @@ However, (23) is a good first approximation of what the shardchain global state 
 
 Essentially, the global workchain state must be given by the same type ShardchainState as the shardchain state, because it is the shardchain state we would obtain if all existing shardchains of this workchain suddenly merged into one. 
 
-2.5.5. Low-level perspective: “bag of cells”. There is a “low-level” description of the account-chain or shardchain state as well, complementary to the “high-level” description given above. This description is quite important, because it turns out to be pretty universal, providing a common basis for representing, storing, serializing and transferring by network almost all data used by the TON Blockchain (blocks, shardchain states, smart-contract storage, Merkle proofs, etc.). At the same time, such a universal “low-level” 
-
-39 
-
-2.5. Global Shardchain State. “Bag of Cells” Philosophy. 
-
-description, once understood and implemented, allows us to concentrate our attention on the “high-level” considerations only. 
+2.5.5. Low-level perspective: “bag of cells”. There is a “low-level” description of the account-chain or shardchain state as well, complementary to the “high-level” description given above. This description is quite important, because it turns out to be pretty universal, providing a common basis for representing, storing, serializing and transferring by network almost all data used by the TON Blockchain (blocks, shardchain states, smart-contract storage, Merkle proofs, etc.). At the same time, such a universal “low-level” description, once understood and implemented, allows us to concentrate our attention on the “high-level” considerations only.
 
 Recall that the TVM represents values of arbitrary algebraic types (including, for instance, ShardchainState of (23)) by means of a tree of TVM cells, or cells for short (cf. 2.3.14 and 2.2.5). Any such cell consists of two descriptor bytes, defining certain flags and values 0 _≤ b ≤_ 128 , the quantity of raw bytes, and 0 _≤ c ≤_ 4 , the quantity of references to other cells. Then _b_ raw bytes and _c_ cell references follow.<sup>18</sup> 
 
@@ -774,13 +672,7 @@ The TON Blockchain ultimately consists of shardchain and masterchain blocks. The
 
 However, being a validator is a high responsibility. If a validator signs an invalid block, it can be punished by losing part or all of its stake, and by being temporarily or permanently excluded from the set of validators. If a validator does not participate in creating a block, it does not receive its share of the reward associated with that block. If a validator abstains from creating new blocks for a long time, it may lose part of its stake and be suspended or permanently excluded from the set of validators. 
 
-All this means that the validator does not get its money “for nothing”. Indeed, it must keep track of the states of all or some shardchains (each validator is responsible for validating and creating new blocks in a certain subset of shardchains), perform all computations requested by smart con- 
-
-44 
-
-2.6. Creating and Validating New Blocks 
-
-tracts in these shardchains, receive updates about other shardchains and so on. This activity requires considerable disk space, computing power and network bandwidth. 
+All this means that the validator does not get its money “for nothing”. Indeed, it must keep track of the states of all or some shardchains (each validator is responsible for validating and creating new blocks in a certain subset of shardchains), perform all computations requested by smart contracts in these shardchains, receive updates about other shardchains and so on. This activity requires considerable disk space, computing power and network bandwidth.
 
 2.6.2. Validators instead of miners. Recall that the TON Blockchain uses the Proof-of-Stake approach, instead of the Proof-of-Work approach adopted by Bitcoin, the current version of Ethereum, and most other cryptocurrencies. This means that one cannot “mine” a new block by presenting some proof-ofwork (computing a lot of otherwise useless hashes) and obtain some new coins as a result. Instead, one must become a validator and spend one's computing resources to store and process TON Blockchain requests and data. In short, one must be a validator to mine new coins. In this respect, validators are the new miners. 
 
@@ -804,13 +696,7 @@ Normally, a fisherman would need to become a full node for at least some shardch
 
 2.6.5. Collators: obtaining money by suggesting new blocks to validators. Yet another way to obtain some rewards without being a validator is by becoming a collator. This is a node that prepares and suggests to a validator new shardchain block candidates, complemented (collated) with data taken from the state of this shardchain and from other (usually neighboring) shardchains, along with suitable Merkle proofs. (This is necessary, for example, when some messages need to be forwarded from neighboring shardchains.) Then a validator can easily check the proposed block candidate for validity, without having to download the complete state of this or other shardchains. 
 
-Because a validator needs to submit new (collated) block candidates to obtain some (“mining”) rewards, it makes sense to pay some part of the reward to a collator willing to provide suitable block candidates. In this way, 
-
-46 
-
-2.6. Creating and Validating New Blocks 
-
-a validator may free itself from the necessity of watching the state of the neighboring shardchains, by outsourcing it to a collator. 
+Because a validator needs to submit new (collated) block candidates to obtain some (“mining”) rewards, it makes sense to pay some part of the reward to a collator willing to provide suitable block candidates. In this way, a validator may free itself from the necessity of watching the state of the neighboring shardchains, by outsourcing it to a collator.
 
 However, we expect that during the system's initial deployment phase there will be no separate designated collators, because all validators will be able to act as collators for themselves. 
 
@@ -844,13 +730,7 @@ This selection could be done by a special smart contract. In that case, the sele
 
 2.6.9. Rotating priority order on each task group. There is a certain “priority” order imposed on the members of a shard task group, depending on the hash of the previous masterchain block and (shardchain) block sequence number. This order is determined by generating and sorting some hashes as described above. 
 
-When a new shardchain block needs to be generated, the shard task group validator selected to create this block is normally the first one with respect to this rotating “priority” order. If it fails to create the block, the second or third validator may do it. Essentially, all of them may suggest their block candidates, but the candidate suggested by the validator having the highest 
-
-48 
-
-2.6. Creating and Validating New Blocks 
-
-priority should win as the result of Byzantine Fault Tolerant (BFT) consensus protocol. 
+When a new shardchain block needs to be generated, the shard task group validator selected to create this block is normally the first one with respect to this rotating “priority” order. If it fails to create the block, the second or third validator may do it. Essentially, all of them may suggest their block candidates, but the candidate suggested by the validator having the highest priority should win as the result of Byzantine Fault Tolerant (BFT) consensus protocol.
 
 2.6.10. Propagation of shardchain block candidates. Because shardchain task group membership is known one hour in advance, their members can use that time to build a dedicated “shard validators multicast overlay network”, using the general mechanisms of the TON Network (cf. 3.3). When a new shardchain block needs to be generated—normally one or two seconds after the most recent masterchain block has been propagated—everybody knows who has the highest priority to generate the next block (cf. 2.6.9). This validator will create a new collated block candidate, either by itself or with the aid of a collator (cf. 2.6.5). The validator must check (validate) this block candidate (especially if it has been prepared by some collator) and sign it with its (validator) private key. Then the block candidate is propagated to the remainder of the task group using the prearranged multicast overlay network (the task group creates its own private overlay network as explained in 3.3, and then uses a version of the streaming multicast protocol described in 3.3.15 to propagate block candidates). 
 
@@ -858,13 +738,7 @@ A truly BFT way of doing this would be to use a Byzantine multicast protocol, su
 
 However, a faster and more straightforward way of doing this (cf. also 3.3.15) is to split the block candidate into a sequence of signed one-kilobyte blocks (“chunks”), augment their sequence by a Reed–Solomon or a fountain code (such as the RaptorQ code [9] [14]), and start transmitting chunks to the neighbors in the “multicast mesh” (i.e., the overlay network), expecting them to propagate these chunks further. Once a validator obtains enough chunks to reconstruct the block candidate from them, it signs a confirmation receipt and propagates it through its neighbors to the whole of the group. Then its neighbors stop sending new chunks to it, but may continue to send the (original) signatures of these chunks, believing that this node can generate the subsequent chunks by applying the Reed–Solomon or fountain code by itself (having all data necessary), combine them with signatures, and propagate to its neighbors that are not yet ready. 
 
-If the “multicast mesh” (overlay network) remains connected after removing all “bad” nodes (recall that up to one-third of nodes are allowed to be 
-
-49 
-
-2.6. Creating and Validating New Blocks 
-
-bad in a Byzantine way, i.e., behave in arbitrary malicious fashion), this algorithm will propagate the block candidate as quickly as possible. 
+If the “multicast mesh” (overlay network) remains connected after removing all “bad” nodes (recall that up to one-third of nodes are allowed to be bad in a Byzantine way, i.e., behave in arbitrary malicious fashion), this algorithm will propagate the block candidate as quickly as possible.
 
 Not only the designated high-priority block creator may multicast its block candidate to the whole of the group. The second and third validator by priority may start multicasting their block candidates, either immediately or after failing to receive a block candidate from the top priority validator. However, normally only the block candidate with maximal priority will be signed by all (actually, by at least two-thirds of the task group) validators and committed as a new shardchain block. 
 
@@ -914,13 +788,7 @@ In this way, the validator that signed block _B_ cannot be punished if the origi
 
 Note that by signing a block _B_ the validator asserts that the block is valid given the original state _s_ (i.e., that the result of (24) is not the value _⊥_ indicating that the next state cannot be computed). In this way, the validator must perform minimal formal checks of the cells of the original state that are accessed during the evaluation of (24). 
 
-For example, imagine that the cell expected to contain the original balance of an account accessed from a transaction committed into a block turns out to have zero raw bytes instead of the expected 8 or 16. Then the original 
-
-53 
-
-2.6. Creating and Validating New Blocks 
-
-balance simply cannot be retrieved from the cell, and an “unhandled exception” happens while trying to process the block. In this case, the validator should not sign such a block on pain of being punished. 
+For example, imagine that the cell expected to contain the original balance of an account accessed from a transaction committed into a block turns out to have zero raw bytes instead of the expected 8 or 16. Then the original balance simply cannot be retrieved from the cell, and an “unhandled exception” happens while trying to process the block. In this case, the validator should not sign such a block on pain of being punished.
 
 2.6.23. Signing masterchain blocks. The situation with the masterchain blocks is somewhat different: by signing a masterchain block, the validator asserts not only its relative validity, but also the relative validity of all preceding blocks up to the very first block when this validator assumed its responsibility (but not further back). 
 
@@ -928,13 +796,7 @@ balance simply cannot be retrieved from the cell, and an “unhandled exception�
 
 While limiting _T_ to a thousand validators seems more than sufficient for the first phase of the deployment of the TON Blockchain, a provision must be made for future growth, when the total number of shardchains becomes so large that several hundred validators will not suffice to process all of them. To this end, we introduce an additional configurable parameter _T_<sup>_′_</sup> _≤ T_ (originally equal to _T_ ), and only the top _T_<sup>_′_</sup> elected validators (by stake) are expected to create and sign new masterchain blocks. 
 
-2.6.25. Decentralization of the system. One might suspect that a Proofof-Stake system such as the TON Blockchain, relying on _T ≈_ 1000 validators to create all shardchain and masterchain blocks, is bound to become “too centralized”, as opposed to conventional Proof-of-Work blockchains like Bitcoin or Ethereum, where everybody (in principle) might mine a new block, 
-
-54 
-
-2.6. Creating and Validating New Blocks 
-
-without an explicit upper limit on the total number of miners. 
+2.6.25. Decentralization of the system. One might suspect that a Proofof-Stake system such as the TON Blockchain, relying on _T ≈_ 1000 validators to create all shardchain and masterchain blocks, is bound to become “too centralized”, as opposed to conventional Proof-of-Work blockchains like Bitcoin or Ethereum, where everybody (in principle) might mine a new block, without an explicit upper limit on the total number of miners.
 
 However, popular Proof-of-Work blockchains, such as Bitcoin and Ethereum, currently require vast amounts of computing power (high “hash rates”) to mine new blocks with non-negligible probability of success. Thus, the mining of new blocks tends to be concentrated in the hands of several large players, who invest huge amounts money into datacenters filled with customdesigned hardware optimized for mining; and in the hands of several large mining pools, which concentrate and coordinate the efforts of larger groups of people who are not able to provide a sufficient “hash rate” by themselves. 
 
@@ -964,13 +826,7 @@ One of the most characteristic and unique features of the TON Blockchain is its 
 
 2.7.1. Shard configuration. Recall that, at any given moment of time, each workchain _w_ is split into one or several shardchains ( _w, s_ ) (cf. 2.1.8). These shardchains may be represented by leaves of a binary tree, with root ( _w, ∅_ ) , and each non-leaf node ( _w, s_ ) having children ( _w, s._ 0) and ( _w, s._ 1) . In this way, every account belonging to workchain _w_ is assigned to exactly one shard, and everybody who knows the current shardchain configuration can determine the shard ( _w, s_ ) containing account account_id : it is the only shard with binary string _s_ being a prefix of account_id . 
 
-The shard configuration—i.e., this shard binary tree, or the collection of all active ( _w, s_ ) for a given _w_ (corresponding to the leaves of the shard binary tree)—is part of the masterchain state and is available to everybody 
-
-57 
-
-2.7. Splitting and Merging Shardchains 
-
-#### who keeps track of the masterchain.<sup>22</sup> 
+The shard configuration—i.e., this shard binary tree, or the collection of all active ( _w, s_ ) for a given _w_ (corresponding to the leaves of the shard binary tree)—is part of the masterchain state and is available to everybody #### who keeps track of the masterchain.<sup>22</sup>
 
 2.7.2. Most recent shard configuration and state. Recall that hashes of the most recent shardchain blocks are included in each masterchain block. These hashes are organized in a shard binary tree (actually, a collection of trees, one for each workchain). In this way, each masterchain block contains the most recent shard configuration. 
 
@@ -998,13 +854,7 @@ This is achieved by imposing limits on how far the active shard configuration ma
 
 Roughly speaking, one is imposing a limit on the number of times a shard can be split (e.g., three) or merged (e.g., two) during the period of responsibility of a given collection of validator task groups. Apart from that, after a shard has been created by merging or splitting, it cannot be reconfigured for some period of time (some number of blocks). 
 
-2.7.6. Determining the necessity of split operations. The split operation for a shardchain is triggered by certain formal conditions (e.g., if for 64 consecutive blocks the shardchain blocks are at least 90% full). These conditions are monitored by the shardchain task group. If they are met, 
-
-59 
-
-2.7. Splitting and Merging Shardchains 
-
-first a “split preparation” ag is included in the header of a new shardchain block (and propagated to the masterchain block referring to this shardchain block). Then, several blocks afterwards, the “split commit” ag is included in the header of the shardchain block (and propagated to the next masterchain block). 
+2.7.6. Determining the necessity of split operations. The split operation for a shardchain is triggered by certain formal conditions (e.g., if for 64 consecutive blocks the shardchain blocks are at least 90% full). These conditions are monitored by the shardchain task group. If they are met, first a “split preparation” ag is included in the header of a new shardchain block (and propagated to the masterchain block referring to this shardchain block). Then, several blocks afterwards, the “split commit” ag is included in the header of the shardchain block (and propagated to the next masterchain block).
 
 2.7.7. Performing split operations. After the “split commit” ag is included in a block _B_ of shardchain ( _w, s_ ) , there cannot be a subsequent block _B_<sup>_′_</sup> in that shardchain. Instead, two blocks _B_ 0<sup>_′_and</sup><sup>_B_</sup> 1<sup>_′_of shardchains(</sup><sup>_w, s._0)</sup> and ( _w, s._ 1) , respectively, will be created, both referring to block _B_ as their previous block (and both of them will indicate by a flag in the header that the shard has been just split). The next masterchain block will contain hashes of blocks _B_ 0<sup>_′_and</sup><sup>_B_</sup> 1<sup>_′_ofthenewshardchains;itisnotallowedtocontainthe</sup> hash of a new block _B_<sup>_′_</sup> of shardchain ( _w, s_ ) , because a “split commit” event has already been committed into the previous masterchain block. 
 
@@ -1060,13 +910,7 @@ The two most common paradigms are Proof-of-Work (PoW) and Proof-ofStake (PoS). T
 
 The Proof-of-Stake approach is based on large stakes (nominated in cryptocurrency) made by some special nodes (validators) to assert that they have checked (validated ) some blocks and have found them correct. Validators sign blocks, and receive some small rewards for this; however, if a validator is ever caught signing an incorrect block, and a proof of this is presented, part or all of its stake is forfeit. In this way, the guarantee of validity and immutability of the blockchain is given by the total volume of stakes put by validators on the validity of the blockchain. 
 
-The Proof-of-Stake approach is more natural in the respect that it incentivizes the validators (which replace PoW miners) to perform useful computation (needed to check or create new blocks, in particular, by performing all transactions listed in a block) instead of computing otherwise useless hashes. In this way, validators would purchase hardware that is better adapted to processing user transactions, in order to receive rewards associated with these transactions, which seems quite a useful investment from the perspective of 
-
-63 
-
-2.8. Classification of Blockchain Projects 
-
-the system as a whole. 
+The Proof-of-Stake approach is more natural in the respect that it incentivizes the validators (which replace PoW miners) to perform useful computation (needed to check or create new blocks, in particular, by performing all transactions listed in a block) instead of computing otherwise useless hashes. In this way, validators would purchase hardware that is better adapted to processing user transactions, in order to receive rewards associated with these transactions, which seems quite a useful investment from the perspective of the system as a whole.
 
 However, Proof-of-Stake systems are somewhat more challenging to implement, because one must provide for many rare but possible conditions. For example, some malicious validators might conspire to disrupt the system to extract some profit (e.g., by altering their own cryptocurrency balances). This leads to some non-trivial game-theoretic problems. 
 
@@ -1084,13 +928,7 @@ Essentially, one must answer the following questions about a Proof-ofStake algor
 
 - Is a newly-created block originally signed by only one validator (its producer), or must it collect a majority of validator signatures from the very beginning? 
 
-While there seem to be 2<sup>4</sup> possible classes of PoS algorithms depending on the answers to these questions, the distinction in practice boils down to two 
-
-64 
-
-2.8. Classification of Blockchain Projects 
-
-major approaches to PoS. In fact, most modern PoS algorithms, designed to be used in scalable multi-chain systems, answer the first two questions in the same fashion: only validators can produce new blocks, and they guarantee block validity without requiring all full nodes to check the validity of all blocks by themselves. 
+While there seem to be 2<sup>4</sup> possible classes of PoS algorithms depending on the answers to these questions, the distinction in practice boils down to two major approaches to PoS. In fact, most modern PoS algorithms, designed to be used in scalable multi-chain systems, answer the first two questions in the same fashion: only validators can produce new blocks, and they guarantee block validity without requiring all full nodes to check the validity of all blocks by themselves.
 
 As to the two last questions, their answers turn out to be highly correlated, leaving essentially only two basic options: 
 
@@ -1112,13 +950,7 @@ The obvious disadvantage of the DPOS algorithm is that a new block (and transact
 
 We believe that the BFT approach, while more sophisticated to implement and requiring longer time intervals between blocks than DPOS, is better adapted to “tightly-coupled” (cf. 2.8.14) multichain systems, because other blockchains can start acting almost immediately after seeing a committed transaction (e.g., generating a message intended for them) in a new block, without waiting for twenty confirmations of validity (i.e., the next twenty blocks), or waiting for the next six blocks to be sure that no forks appear and verifying the new block by themselves (verifying blocks of other blockchains may become prohibitive in a scalable multi-chain system). Thus they can achieve scalability while preserving high reliability and availability (cf. 2.8.12). 
 
-On the other hand, DPOS might be a good choice for a “loosely-coupled” 
-
-66 
-
-2.8. Classification of Blockchain Projects 
-
-multi-chain system, where fast interaction between blockchains is not required e.g., if each blockchain (“workchain”) represents a separate distributed exchange, and inter-blockchain interaction is limited to rare transfers of tokens from one workchain into another (or, rather, trading one altcoin residing in one workchain for another at a rate approaching 1 : 1 ). This is what is actually done in the BitShares project, which uses DPOS quite successfully. 
+On the other hand, DPOS might be a good choice for a “loosely-coupled” multi-chain system, where fast interaction between blockchains is not required e.g., if each blockchain (“workchain”) represents a separate distributed exchange, and inter-blockchain interaction is limited to rare transfers of tokens from one workchain into another (or, rather, trading one altcoin residing in one workchain for another at a rate approaching 1 : 1 ). This is what is actually done in the BitShares project, which uses DPOS quite successfully.
 
 To summarize, while DPOS can generate new blocks and include transactions into them faster (with smaller intervals between blocks), these transactions reach the level of trust required to use them in other blockchains and off-chain applications as “committed” and “immutable” much more slowly than in the BFT systems—say, in thirty seconds<sup>26</sup> instead of five. Faster transaction inclusion does not mean faster transaction commitment. This could become a huge problem if fast inter-blockchain interaction is required. In that case, one must abandon DPOS and opt for BFT PoS instead. 
 
@@ -1142,13 +974,7 @@ In a multi-chain system, all blockchains may be essentially of the same type and
 
 2.8.9. Mixed heterogeneous-homogeneous systems. Sometimes we have a mixed system, where there are several sets of types or rules for blockchains, but many blockchains with the same rules are present, and this fact is explicitly exploited. Then it is a mixed heterogeneous-homogeneous system. To our knowledge, the TON Blockchain is the only example of such a system. 
 
-2.8.10. Heterogeneous systems with several workchains having the same rules, or confederations. In some cases, several blockchains (work- 
-
-68 
-
-2.8. Classification of Blockchain Projects 
-
-chains) with the same rules can be present in a heterogeneous system, but the interaction between them is the same as between blockchains with different rules (i.e., their similarity is not exploited explicitly). Even if they appear to use “the same” cryptocurrency, they in fact use different “altcoins” (independent incarnations of the cryptocurrency). Sometimes one can even have certain mechanisms to convert these altcoins at a rate near to 1 : 1 . However, this does not make the system homogeneous in our view; it remains heterogeneous. We say that such a heterogeneous collection of workchains with the same rules is a confederation. 
+2.8.10. Heterogeneous systems with several workchains having the same rules, or confederations. In some cases, several blockchains (workchains) with the same rules can be present in a heterogeneous system, but the interaction between them is the same as between blockchains with different rules (i.e., their similarity is not exploited explicitly). Even if they appear to use “the same” cryptocurrency, they in fact use different “altcoins” (independent incarnations of the cryptocurrency). Sometimes one can even have certain mechanisms to convert these altcoins at a rate near to 1 : 1 . However, this does not make the system homogeneous in our view; it remains heterogeneous. We say that such a heterogeneous collection of workchains with the same rules is a confederation.
 
 While making a heterogeneous system that allows one to create several workchains with the same rules (i.e., a confederation) may seem a cheap way of building a scalable system, this approach has a lot of drawbacks, too. Essentially, if someone hosts a large project in many workchains with the same rules, she does not obtain a large project, but rather a lot of small instances of this project. This is like having a chat application (or a game) that allows having at most 50 members in any chat (or game) room, but “scales” by creating new rooms to accommodate more users when necessary. As a result, a lot of users can participate in the chats or in the game, but can we say that such a system is truly scalable? 
 
@@ -1156,13 +982,7 @@ While making a heterogeneous system that allows one to create several workchains
 
 In some cases, the masterchain is external, meaning that it is not a part of the project, but some other pre-existing blockchain, originally completely unrelated to its use by the new project and agnostic of it. For example, one can try to use the Ethereum blockchain as a masterchain for an external project, and publish special smart contracts into the Ethereum blockchain for this purpose (e.g., for electing and punishing validators). 
 
-2.8.12. Sharding support. Some blockchain projects (or systems) have native support for sharding, meaning that several (necessarily homogeneous; cf. 2.8.8) blockchains are thought of as shards of a single (from a highlevel perspective) virtual blockchain. For example, one can create 256 shard 
-
-69 
-
-2.8. Classification of Blockchain Projects 
-
-blockchains (“shardchains”) with the same rules, and keep the state of an account in exactly one shard selected depending on the first byte of its account_id . 
+2.8.12. Sharding support. Some blockchain projects (or systems) have native support for sharding, meaning that several (necessarily homogeneous; cf. 2.8.8) blockchains are thought of as shards of a single (from a highlevel perspective) virtual blockchain. For example, one can create 256 shard blockchains (“shardchains”) with the same rules, and keep the state of an account in exactly one shard selected depending on the first byte of its account_id .
 
 Sharding is a natural approach to scaling blockchain systems, because, if it is properly implemented, users and smart contracts in the system need not be aware of the existence of sharding at all. In fact, one often wants to add sharding to an existing single-chain project (such as Ethereum) when the load becomes too high. 
 
@@ -1184,13 +1004,7 @@ Sometimes partial support for messaging is added, by standardizing the format of
 
 By contrast, “tightly-coupled” systems include special mechanisms to provide fast messaging between all blockchains. The desired behavior is to be able to deliver a message into another workchain immediately after it has been generated in a block of the originating blockchain. On the other hand, “tightly-coupled” systems are also expected to maintain overall consistency in the case of forks. While these two requirements appear to be contradictory at first glance, we believe that the mechanisms used by the TON Blockchain (the inclusion of shardchain block hashes into masterchain blocks; the use of “vertical” blockchains for fixing invalid blocks, cf. 2.1.17; hypercube routing, cf. 2.4.19; Instant Hypercube Routing, cf. 2.4.20) enable it to be a “tightly-coupled” system, perhaps the only one so far. 
 
-Of course, building a “loosely-coupled” system is much simpler; however, 
-
-71 
-
-2.8. Classification of Blockchain Projects 
-
-fast and efficient sharding (cf. 2.8.12) requires the system to be “tightlycoupled”. 
+Of course, building a “loosely-coupled” system is much simpler; however, fast and efficient sharding (cf. 2.8.12) requires the system to be “tightlycoupled”.
 
 2.8.15. Simplified classification. Generations of blockchain projects. The classification we have suggested so far splits all blockchain projects into a large number of classes. However, the classification criteria we use happen to be quite correlated in practice. This enables us to suggest a simplified “generational” approach to the classification of blockchain projects, as a very rough approximation of reality, with some examples. Projects that have not been implemented and deployed yet are shown in italics; the most important characteristics of a generation are shown in bold. 
 
@@ -1208,13 +1022,7 @@ fast and efficient sharding (cf. 2.8.12) requires the system to be “tightlycou
 
 While not all blockchain projects fall precisely into one of these categories, most of them do. 
 
-2.8.16. Complications of changing the “genome” of a blockchain project. The above classification defines the “genome” of a blockchain project. This genome is quite “rigid”: it is almost impossible to change it once the project is deployed and is used by a lot of people. One would need a series of hard forks (which would require the approval of the majority of the 
-
-72 
-
-2.9. Comparison to Other Blockchain Projects 
-
-community), and even then the changes would need to be very conservative in order to preserve backward compatibility (e.g., changing the semantics of the virtual machine might break existing smart contracts). An alternative would be to create new “sidechains” with their different rules, and bind them somehow to the blockchain (or the blockchains) of the original project. One might use the blockchain of the existing single-blockchain project as an external masterchain for an essentially new and separate project.<sup>27</sup> 
+2.8.16. Complications of changing the “genome” of a blockchain project. The above classification defines the “genome” of a blockchain project. This genome is quite “rigid”: it is almost impossible to change it once the project is deployed and is used by a lot of people. One would need a series of hard forks (which would require the approval of the majority of the community), and even then the changes would need to be very conservative in order to preserve backward compatibility (e.g., changing the semantics of the virtual machine might break existing smart contracts). An alternative would be to create new “sidechains” with their different rules, and bind them somehow to the blockchain (or the blockchains) of the original project. One might use the blockchain of the existing single-blockchain project as an external masterchain for an essentially new and separate project.<sup>27</sup>
 
 Our conclusion is that the genome of a project is very hard to change once it has been deployed. Even starting with PoW and planning to replace it with PoS in the future is quite complicated.<sup>28</sup> Adding shards to a project originally designed without support for them seems almost impossible.<sup>29</sup> In fact, adding support for smart contracts into a project (namely, Bitcoin) originally designed without support for such features has been deemed impossible (or at least undesirable by the majority of the Bitcoin community) and eventually led to the creation of a new blockchain project, Ethereum. 
 
@@ -1265,13 +1073,7 @@ This idea, while intriguing, has the obvious drawback that it forbids any optimi
 
 2.9.7. EOS [5]; https://eos.io. EOS (2018 or later) is a proposed heterogeneous multi-blockchain DPoS system with smart contract support and with some minimal support for messaging (still loosely-coupled in the sense described in 2.8.14). It is an attempt by the same team that has previously 
 
-> 30https://blog.ethereum.org/2015/08/01/introducing-casper-friendly-ghost/ 
-
-75 
-
-2.9. Comparison to Other Blockchain Projects 
-
-successfully created the BitShares and SteemIt projects, demonstrating the strong points of the DPoS consensus algorithm. Scalability will be achieved by creating specialized workchains for projects that need it (e.g., a distributed exchange might use a workchain supporting a special set of optimized transactions, similarly to what BitShares did) and by creating multiple workchains with the same rules (confederations in the sense described in 2.8.10). The drawbacks and limitations of this approach to scalability have been discussed in loc. cit. Cf. also 2.8.5, 2.8.12, and 2.8.14 for a more detailed discussion of DPoS, sharding, interaction between workchains and their implications for the scalability of a blockchain system. 
+> 30https://blog.ethereum.org/2015/08/01/introducing-casper-friendly-ghost/ successfully created the BitShares and SteemIt projects, demonstrating the strong points of the DPoS consensus algorithm. Scalability will be achieved by creating specialized workchains for projects that need it (e.g., a distributed exchange might use a workchain supporting a special set of optimized transactions, similarly to what BitShares did) and by creating multiple workchains with the same rules (confederations in the sense described in 2.8.10). The drawbacks and limitations of this approach to scalability have been discussed in loc. cit. Cf. also 2.8.5, 2.8.12, and 2.8.14 for a more detailed discussion of DPoS, sharding, interaction between workchains and their implications for the scalability of a blockchain system.
 
 At the same time, even if one will not be able to “create a Facebook inside a blockchain” (cf. 2.9.13), EOS or otherwise, we think that EOS might become a convenient platform for some highly-specialized weakly interacting distributed applications, similar to BitShares (decentralized exchange) and SteemIt (decentralized blog platform). 
 
@@ -1285,35 +1087,17 @@ As such, PolkaDot might become a platform for large-scale private blockchains, w
 
 However, PolkaDot has no sharding support and is not tightly-coupled. This somewhat hampers its scalability, which is similar to that of EOS. (Perhaps a bit better, because PolkaDot uses BFT PoS instead of DPoS.) 
 
-2.9.9. Universa; https://universa.io. The only reason we mention this 
-
-76 
-
-2.9. Comparison to Other Blockchain Projects 
-
-unusual blockchain project here is because it is the only project so far to make in passing an explicit reference to something similar to our Infinite Sharding Paradigm (cf. 2.1.2). Its other peculiarity is that it bypasses all complications related to Byzantine Fault Tolerance by promising that only trusted and licensed partners of the project will be admitted as validators, hence they will never commit invalid blocks. This is an interesting decision; however, it essentially makes a blockchain project deliberately centralized, something blockchain projects usually want to avoid (why does one need a blockchain at all to work in a trusted centralized environment?). 
+2.9.9. Universa; https://universa.io. The only reason we mention this unusual blockchain project here is because it is the only project so far to make in passing an explicit reference to something similar to our Infinite Sharding Paradigm (cf. 2.1.2). Its other peculiarity is that it bypasses all complications related to Byzantine Fault Tolerance by promising that only trusted and licensed partners of the project will be admitted as validators, hence they will never commit invalid blocks. This is an interesting decision; however, it essentially makes a blockchain project deliberately centralized, something blockchain projects usually want to avoid (why does one need a blockchain at all to work in a trusted centralized environment?).
 
 2.9.10. Plasma; https://plasma.io). Plasma (2019?) is an unconventional blockchain project from another co-founder of Ethereum. It is supposed to mitigate some limitations of Ethereum without introducing sharding. In essence, it is a separate project from Ethereum, introducing a hierarchy of (heterogeneous) workchains, bound to the Ethereum blockchain (to be used as an external masterchain) at the top level. Funds can be transferred from any blockchain up in the hierarchy (starting from the Ethereum blockchain as the root), along with a description of a job to be done. Then the necessary computations are done in the child workchain (possibly requiring forwarding of parts of the original job further down the tree), their results are passed up, and a reward is collected. The problem of achieving consistency and validating these workchains is circumvented by a (payment channel-inspired) mechanism allowing users to unilaterally withdraw their funds from a misbehaving workchain to its parent workchain (albeit slowly), and re-allocate their funds and their jobs to another workchain. In this way, Plasma might become a platform for distributed computations bound to the Ethereum blockchain, something like a “mathematical co-processor”. However, this does not seem like a way to achieve true generalpurpose scalability. 
 
-2.9.11. Specialized blockchain projects. There are also some specialized blockchain projects, such as FileCoin (a system that incentivizes users to offer their disk space for storing the files of other users who are willing to pay for it), Golem (a blockchain-based platform for renting and lending computing power for specialized applications such as 3D-rendering) or SONM (another similar computing power-lending project). Such projects do not introduce anything conceptually new on the level of blockchain organization; rather, they are particular blockchain applications, which could be implemented by smart contracts running in a general-purpose blockchain, provided it can 
-
-77 
-
-2.9. Comparison to Other Blockchain Projects 
-
-deliver the required performance. As such, projects of this kind are likely to use one of the existing or planned blockchain projects as their base, such as EOS, PolkaDot or TON. If a project needs “true” scalability (based on sharding), it would better use TON; if it is content to work in a “confederated” context by defining a family of workchains of its own, explicitly optimized for its purpose, it might opt for EOS or PolkaDot. 
+2.9.11. Specialized blockchain projects. There are also some specialized blockchain projects, such as FileCoin (a system that incentivizes users to offer their disk space for storing the files of other users who are willing to pay for it), Golem (a blockchain-based platform for renting and lending computing power for specialized applications such as 3D-rendering) or SONM (another similar computing power-lending project). Such projects do not introduce anything conceptually new on the level of blockchain organization; rather, they are particular blockchain applications, which could be implemented by smart contracts running in a general-purpose blockchain, provided it can deliver the required performance. As such, projects of this kind are likely to use one of the existing or planned blockchain projects as their base, such as EOS, PolkaDot or TON. If a project needs “true” scalability (based on sharding), it would better use TON; if it is content to work in a “confederated” context by defining a family of workchains of its own, explicitly optimized for its purpose, it might opt for EOS or PolkaDot.
 
 2.9.12. The TON Blockchain. The TON (The Open Network) Blockchain (planned 2018) is the project we are describing in this document. It is designed to be the first fth-generation blockchain project—that is, a BFT PoS-multichain project, mixed homogeneous/heterogeneous, with support for (shardable) custom workchains, with native sharding support, and tightlycoupled (in particular, capable of forwarding messages between shards almost instantly while preserving a consistent state of all shardchains). As such, it will be a truly scalable general-purpose blockchain project, capable of accommodating essentially any applications that can be implemented in a blockchain at all. When augmented by the other components of the TON Project (cf. 1), its possibilities expand even further. 2.9.13. Is it possible to “upload Facebook into a blockchain”? Sometimes people claim that it will be possible to implement a social network on the scale of Facebook as a distributed application residing in a blockchain. Usually a favorite blockchain project is cited as a possible “host” for such an application. 
 
 We cannot say that this is a technical impossibility. Of course, one needs a tightly-coupled blockchain project with true sharding (i.e., TON) in order for such a large application not to work too slowly (e.g., deliver messages and updates from users residing in one shardchain to their friends residing in another shardchain with reasonable delays). However, we think that this is not needed and will never be done, because the price would be prohibitive. 
 
-Let us consider “uploading Facebook into a blockchain” as a thought experiment; any other project of similar scale might serve as an example as well. Once Facebook is uploaded into a blockchain, all operations currently done by Facebook's servers will be serialized as transactions in certain blockchains (e.g., TON's shardchains), and will be performed by all validators of these blockchains. Each operation will have to be performed, say, at least twenty times, if we expect every block to collect at least twenty validator signatures (immediately or eventually, as in DPOS systems). Similarly, all data kept by 
-
-78 
-
-2.9. Comparison to Other Blockchain Projects 
-
-Facebook's servers on their disks will be kept on the disks of all validators for the corresponding shardchain (i.e., in at least twenty copies). 
+Let us consider “uploading Facebook into a blockchain” as a thought experiment; any other project of similar scale might serve as an example as well. Once Facebook is uploaded into a blockchain, all operations currently done by Facebook's servers will be serialized as transactions in certain blockchains (e.g., TON's shardchains), and will be performed by all validators of these blockchains. Each operation will have to be performed, say, at least twenty times, if we expect every block to collect at least twenty validator signatures (immediately or eventually, as in DPOS systems). Similarly, all data kept by Facebook's servers on their disks will be kept on the disks of all validators for the corresponding shardchain (i.e., in at least twenty copies).
 
 Because the validators are essentially the same servers (or perhaps clusters of servers, but this does not affect the validity of this argument) as those currently used by Facebook, we see that the total hardware expenses associated with running Facebook in a blockchain are at least twenty times higher than if it were implemented in the conventional way. 
 
@@ -1347,13 +1131,7 @@ When a node learns another node's abstract address, it must also receive its “
 
 Suppose that the sender somehow knows the IP-address and the UDP port of the receiver who owns the destination abstract address, and that both the receiver and the sender use abstract addresses derived from 256-bit ECC public keys. 
 
-In this case, the sender simply augments the datagram to be sent by its ECC signature (done with its private key) and its source address (or the preimage of the source address, if the receiver is not known to know that 
-
-81 
-
-3.1. Abstract Datagram Network Layer 
-
-preimage yet). The result is encrypted with the recipient's public key, embedded into a UDP datagram and sent to the known IP and port of the recipient. Because the first 256 bits of the UDP datagram contain the recipient's abstract address, the recipient can identify which private key should be used to decrypt the remainder of the datagram. Only after that is the sender's identity revealed. 
+In this case, the sender simply augments the datagram to be sent by its ECC signature (done with its private key) and its source address (or the preimage of the source address, if the receiver is not known to know that preimage yet). The result is encrypted with the recipient's public key, embedded into a UDP datagram and sent to the known IP and port of the recipient. Because the first 256 bits of the UDP datagram contain the recipient's abstract address, the recipient can identify which private key should be used to decrypt the remainder of the datagram. Only after that is the sender's identity revealed.
 
 3.1.4. Less secure way, with the sender's address in plaintext. Sometimes a less secure scheme is sufficient, when the recipient's and the sender's addresses are kept in plaintext in the UDP datagram; the sender's private key and the recipient's public key are combined together using ECDH (Elliptic Curve Diffie–Hellman) to generate a 256-bit shared secret, which is used afterwards, along with a random 256-bit nonce also included in the unencrypted part, to derive AES keys used for encryption. The integrity may be provided, for instance, by concatenating the hash of the original plaintext data to the plaintext before encryption. 
 
@@ -1363,13 +1141,7 @@ This approach has the advantage that, if more than one datagram is expected to b
 
 After that, a channel identifier is derived from the shared secret combined with some additional data (such as the sender's and recipient's addresses), for instance by hashing, and that identifier is used as the first 256 bits of UDP datagrams carrying data encrypted with the aid of that shared secret. 
 
-3.1.6. Channel as a tunnel identifier. In general, a “channel”, or “channel identifier” simply selects a way of processing an inbound UDP datagram, known to the receiver. If the channel is the receiver's abstract address, the processing is done as outlined in 3.1.3 or 3.1.4; if the channel is an estab- 
-
-82 
-
-3.1. Abstract Datagram Network Layer 
-
-lished point-to-point channel discussed in 3.1.5, the processing consists in decrypting the datagram with the aid of the shared secret as explained in loc. cit., and so on. 
+3.1.6. Channel as a tunnel identifier. In general, a “channel”, or “channel identifier” simply selects a way of processing an inbound UDP datagram, known to the receiver. If the channel is the receiver's abstract address, the processing is done as outlined in 3.1.3 or 3.1.4; if the channel is an established point-to-point channel discussed in 3.1.5, the processing consists in decrypting the datagram with the aid of the shared secret as explained in loc. cit., and so on.
 
 In particular, a channel identifier can actually select a “tunnel”, when the immediate recipient simply forwards the received message to somebody else—the actual recipient or another proxy. Some encryption or decryption steps (reminiscent of “onion routing” [6] or even “garlic routing”<sup>31</sup> ) might be done along the way, and another channel identifier might be used for reencrypted forwarded packets (for example, a peer-to-peer channel could be employed to forward the packet to the next recipient on the path). In this way, some support for “tunneling” and “proxying”—somewhat similar to that provided by the TOR or _I_<sup>2</sup> _P_ projects—can be added on the level of the TON Abstract Datagram Network Layer, without affecting the functionality of all higher-level TON network protocols, which would be agnostic of such an addition. This opportunity is exploited by the TON Proxy service (cf. 4.1.10). 
 
@@ -1381,13 +1153,7 @@ In this case, the node will send packets to a special “zero channel” of the 
 
 Once at least one node is known, it is easy to populate the “neighbor table” and “routing table” by more entries, learning them from answers to 
 
-> 31https://geti2p.net/en/docs/how/garlic-routing 
-
-83 
-
-3.2. TON DHT: Kademlia-like Distributed Hash Table 
-
-special queries sent to the already known nodes. 
+> 31https://geti2p.net/en/docs/how/garlic-routing special queries sent to the already known nodes.
 
 Not all nodes are required to process datagrams sent to the zero channel, but those used to bootstrap light clients should support this feature. 
 
@@ -1401,13 +1167,7 @@ The TON Distributed Hash Table (DHT) plays a crucial role in the networking part
 
 The TON DHT is a member of the family of Kademlia-like distributed hash tables [10]. 
 
-3.2.1. Keys of the TON DHT. The keys of the TON DHT are simply 256bit integers. In most cases, they are computed as sha256 of a TL-serialized object (cf. 2.2.5), called preimage of the key, or key description. In some cases, the abstract addresses of the TON Network nodes (cf. 3.1.1) can also 
-
-84 
-
-3.2. TON DHT: Kademlia-like Distributed Hash Table 
-
-be used as keys of the TON DHT, because they are also 256-bit, and they are also hashes of TL-serialized objects. For example, if a node is not afraid of publishing its IP address, it can be found by anybody who knows its abstract address by simply looking up that address as a key in the DHT. 
+3.2.1. Keys of the TON DHT. The keys of the TON DHT are simply 256bit integers. In most cases, they are computed as sha256 of a TL-serialized object (cf. 2.2.5), called preimage of the key, or key description. In some cases, the abstract addresses of the TON Network nodes (cf. 3.1.1) can also be used as keys of the TON DHT, because they are also 256-bit, and they are also hashes of TL-serialized objects. For example, if a node is not afraid of publishing its IP address, it can be found by anybody who knows its abstract address by simply looking up that address as a key in the DHT.
 
 3.2.2. Values of the DHT. The values assigned to these 256-bit keys are essentially arbitrary byte strings of limited length. The interpretation of such byte strings is determined by the preimage of the corresponding key; it is usually known both by the node that looks up the key, and by the node that stores the key. 
 
@@ -1421,13 +1181,7 @@ Here _x ⊕ y_ denotes the bitwise eXclusive OR (XOR) of two bit sequences of th
 
 The Kademlia distance introduces a metric on the set **2**<sup>256</sup> of all 256-bit sequences. In particular, we have _dK_ ( _x, y_ ) = 0 if and only if _x_ = _y_ , _dK_ ( _x, y_ ) = _dK_ ( _y, x_ ) , and _dK_ ( _x, z_ ) _≤ dK_ ( _x, y_ ) + _dK_ ( _y, z_ ) . Another important property is that there is only one point at any given distance from _x_ : _dK_ ( _x, y_ ) = _dK_ ( _x, y_<sup>_′_</sup> ) implies _y_ = _y_<sup>_′_</sup> . 
 
-3.2.5. Kademlia-like DHTs and the TON DHT. We say that a distributed hash table (DHT) with 256-bit keys and 256-bit node addresses is a 
-
-85 
-
-3.2. TON DHT: Kademlia-like Distributed Hash Table 
-
-Kademlia-like DHT if it is expected to keep the value of key _K_ on _s_ Kademlianearest nodes to _K_ (i.e., the _s_ nodes with smallest Kademlia distance from their addresses to _K_ .) 
+3.2.5. Kademlia-like DHTs and the TON DHT. We say that a distributed hash table (DHT) with 256-bit keys and 256-bit node addresses is a Kademlia-like DHT if it is expected to keep the value of key _K_ on _s_ Kademlianearest nodes to _K_ (i.e., the _s_ nodes with smallest Kademlia distance from their addresses to _K_ .)
 
 Here _s_ is a small parameter, say, _s_ = 7 , needed to improve reliability of the DHT (if we would keep the key only on one node, the nearest one to _K_ , the value of that key would be lost if that only node goes offine). The TON DHT is a Kademlia-like DHT, according to this definition. It is implemented over the ADNL protocol described in 3.1. 
 
@@ -1471,13 +1225,7 @@ This mechanism might be used to create a distributed “torrent tracker”, wher
 
 TON Storage (cf. 4.1.7) uses this technology to nd the nodes that have a copy of a required file (e.g., a snapshot of the state of a shardchain, or an old block). However, its more important use is to create “overlay multicast subnetworks” and “network interest groups” (cf. 3.3). The idea is that only some nodes are interested in the updates of a specific shardchain. If the number of shardchains becomes very large, finding even one node interested in the same shard may become complicated. This “distributed torrent tracker” provides a convenient way to nd some of these nodes. Another option would be to request them from a validator, but this would not be a scalable approach, and validators might choose not to respond to such queries coming from arbitrary unknown nodes. 
 
-3.2.11. Fall-back keys. Most of the “key types” described so far have an extra 32-bit integer field in their TL description, normally equal to zero. However, if the key obtained by hashing that description cannot be retrieved from or updated in the TON DHT, the value in this field is increased, and 
-
-88 
-
-3.2. TON DHT: Kademlia-like Distributed Hash Table 
-
-a new attempt is made. In this way, one cannot “capture” and “censor” a key (i.e., perform a key retention attack) by creating a lot of abstract addresses lying near the key under attack and controlling the corresponding DHT nodes. 
+3.2.11. Fall-back keys. Most of the “key types” described so far have an extra 32-bit integer field in their TL description, normally equal to zero. However, if the key obtained by hashing that description cannot be retrieved from or updated in the TON DHT, the value in this field is increased, and a new attempt is made. In this way, one cannot “capture” and “censor” a key (i.e., perform a key retention attack) by creating a lot of abstract addresses lying near the key under attack and controlling the corresponding DHT nodes.
 
 3.2.12. Locating services. Some services, located in the TON Network and available through the (higher-level protocols built upon the) TON ADNL described in 3.1, may want to publish their abstract addresses somewhere, so that their clients would know where to nd them. 
 
@@ -1491,13 +1239,7 @@ A typical case is that of a node in the TON Payments “lightning network” (cf
 
 One option would be to include an abstract network address in the smart contract creating the payment channel. A more flexible option is to include a public key in the smart contract, and then use DHT as explained in 3.2.12. 
 
-The most natural way would be to use the same private key that controls the account in the TON Blockchain to sign and publish updates in the TON DHT about the abstract addresses associated with that account. This is done almost in the same way as described in 3.2.12; however, the DHT key employed would require a special key description, containing only the 
-
-89 
-
-3.3. Overlay Networks and Multicasting Messages 
-
-account_id itself, equal to sha256 of the “account description”, which contains the public key of the account. The signature, included in the value of this DHT key, would contain the account description as well. 
+The most natural way would be to use the same private key that controls the account in the TON Blockchain to sign and publish updates in the TON DHT about the abstract addresses associated with that account. This is done almost in the same way as described in 3.2.12; however, the DHT key employed would require a special key description, containing only the account_id itself, equal to sha256 of the “account description”, which contains the public key of the account. The signature, included in the value of this DHT key, would contain the account description as well.
 
 In this way, a mechanism for locating abstract network addresses of some owners of the TON Blockchain accounts becomes available. 
 
@@ -1513,13 +1255,7 @@ Notice that in order to make an abstract address “public” (reachable from an
 
 In a multi-blockchain system like the TON Blockchain, even full nodes would normally be interested in obtaining updates (i.e., new blocks) only about some shardchains. To this end, a special overlay (sub)network must be built inside the TON Network, on top of the ADNL protocol discussed in 3.1, one for each shardchain. 
 
-Therefore, the need to build arbitrary overlay subnetworks, open to any nodes willing to participate, arises. Special gossip protocols, built upon ADNL, will be run in these overlay networks. In particular, these gossip 
-
-90 
-
-3.3. Overlay Networks and Multicasting Messages 
-
-protocols may be used to propagate (broadcast) arbitrary data inside such a subnetwork. 
+Therefore, the need to build arbitrary overlay subnetworks, open to any nodes willing to participate, arises. Special gossip protocols, built upon ADNL, will be run in these overlay networks. In particular, these gossip protocols may be used to propagate (broadcast) arbitrary data inside such a subnetwork.
 
 3.3.1. Overlay networks. An overlay (sub)network is simply a (virtual) network implemented inside some larger network. Usually only some nodes of the larger network participate in the overlay subnetwork, and only some “links” between these nodes, physical or virtual, are part of the overlay subnetwork. 
 
@@ -1535,13 +1271,7 @@ Links to neighbors in TON overlay networks can be implemented using dedicated pe
 
 Each node of an overlay network maintains a list of neighbors (with respect to the overlay network), containing their abstract addresses (which they use to identify them in the overlay network) and some link data (e.g., the ADNL channel used to communicate with them). 
 
-3.3.3. Private and public overlay networks. Some overlay networks are public, meaning that any node can join them at will. Other are private, meaning that only certain nodes can be admitted (e.g., those that can prove 
-
-91 
-
-3.3. Overlay Networks and Multicasting Messages 
-
-their identities as validators.) Some private overlay networks can even be unknown to the “general public”. The information about such overlay networks is made available only to certain trusted nodes; for example, it can be encrypted with a public key, and only nodes having a copy of the corresponding private key will be able to decrypt this information. 
+3.3.3. Private and public overlay networks. Some overlay networks are public, meaning that any node can join them at will. Other are private, meaning that only certain nodes can be admitted (e.g., those that can prove their identities as validators.) Some private overlay networks can even be unknown to the “general public”. The information about such overlay networks is made available only to certain trusted nodes; for example, it can be encrypted with a public key, and only nodes having a copy of the corresponding private key will be able to decrypt this information.
 
 3.3.4. Centrally controlled overlay networks. Some overlay networks are centrally controlled, by one or several nodes, or by the owner of some widely-known public key. Others are decentralized, meaning that there are no specific nodes responsible for them. 
 
@@ -1569,13 +1299,7 @@ This enables the joining member to populate her “adjacency” or “neighbor l
 
 On the other hand, every node sometimes requests from a randomly chosen neighbor its list of neighbors (or some random selection thereof), and uses it to partially update its own neighbor list, by adding some newly-discovered nodes to it, and removing some of the old ones, either randomly or depending on their response times and datagram loss statistics. 
 
-3.3.9. The overlay network is a random subgraph. In this way, the overlay network becomes a random subgraph inside the ADNL network. If the degree of each vertex is at least three (i.e., if each node is connected to at least three neighbors), this random graph is known to be connected with a probability almost equal to one. More precisely, the probability of a random graph with _n_ vertices being disconnected is exponentially small, and this probability can be completely neglected if, say, _n ≥_ 20 . (Of course, this does not apply in the case of a global network partition, when nodes on different sides of the partition have no chance to learn about each other.) On the 
-
-93 
-
-3.3. Overlay Networks and Multicasting Messages 
-
-other hand, if _n_ is smaller than 20, it would suffice to require each vertex to have, say, at least ten neighbors. 
+3.3.9. The overlay network is a random subgraph. In this way, the overlay network becomes a random subgraph inside the ADNL network. If the degree of each vertex is at least three (i.e., if each node is connected to at least three neighbors), this random graph is known to be connected with a probability almost equal to one. More precisely, the probability of a random graph with _n_ vertices being disconnected is exponentially small, and this probability can be completely neglected if, say, _n ≥_ 20 . (Of course, this does not apply in the case of a global network partition, when nodes on different sides of the partition have no chance to learn about each other.) On the other hand, if _n_ is smaller than 20, it would suffice to require each vertex to have, say, at least ten neighbors.
 
 3.3.10. TON overlay networks are optimized for lower latency. TON overlay networks optimize the “random” network graph generated by the previous method as follows. Every node tries to retain at least three neighbors with the minimal round-trip time, changing this list of “fast neighbors” very rarely. At the same time, it also has at least three other “slow neighbors” that are chosen completely randomly, so that the overlay network graph would always contain a random subgraph. This is required to maintain connectivity and prevent splitting of the overlay network into several unconnected regional subnetworks. At least three “intermediate neighbors”, which have intermediate round-trip times, bounded by a certain constant (actually, a function of the round-trip times of the fast and the slow neighbors), are also chosen and retained. 
 
@@ -1587,13 +1311,7 @@ In this way, the graph of an overlay network still maintains enough randomness t
 
 There are in fact several broadcast protocols, optimized for different use cases. The simplest of them receives new broadcast messages and relays them to all neighbors that have not yet sent a copy of that message themselves. 
 
-3.3.13. More sophisticated broadcast protocols. Some applications may warrant more sophisticated broadcast protocols. For instance, for broadcasting messages of substantial size, it makes sense to send to the neighbors not the newly-received message itself, but its hash (or a collection of hashes 
-
-94 
-
-3.3. Overlay Networks and Multicasting Messages 
-
-of new messages). The neighbor may request the message itself after learning a previously unseen message hash, to be transferred, say, using the reliable large datagram protocol (RLDP) discussed in 3.1.9. In this way, the new message will be downloaded from one neighbor only. 
+3.3.13. More sophisticated broadcast protocols. Some applications may warrant more sophisticated broadcast protocols. For instance, for broadcasting messages of substantial size, it makes sense to send to the neighbors not the newly-received message itself, but its hash (or a collection of hashes of new messages). The neighbor may request the message itself after learning a previously unseen message hash, to be transferred, say, using the reliable large datagram protocol (RLDP) discussed in 3.1.9. In this way, the new message will be downloaded from one neighbor only.
 
 3.3.14. Checking the connectivity of an overlay network. The connectivity of an overlay network can be checked if there is a known node (e.g., the “owner” or the “creator” of the overlay network) that must be in this overlay network. Then the node in question simply broadcasts from time to time short messages containing the current time, a sequence number and its signature. Any other node can be sure that it is still connected to the overlay network if it has received such a broadcast not too long ago. This protocol can be extended to the case of several well-known nodes; for example, they all will send such broadcasts, and all other nodes will expect to receive broadcasts from more than half of the well-known nodes. 
 
@@ -1601,13 +1319,7 @@ In the case of an overlay network used for propagating new blocks (or just new b
 
 3.3.15. Streaming broadcast protocol. Finally, there is a streaming broadcast protocol for TON overlay networks, used, for example, to propagate block candidates among validators of some shardchain (“shardchain task group”), who, of course, create a private overlay network for that purpose. The same protocol can be used to propagate new shardchain blocks to all full nodes for that shardchain. 
 
-This protocol has already been outlined in 2.6.10: the new (large) broadcast message is split into, say, _N_ one-kilobyte chunks; the sequence of these chunks is augmented to _M ≥ N_ chunks by means of an erasure code such as the Reed–Solomon or a fountain code (e.g., the RaptorQ code [9] [14]), and these _M_ chunks are streamed to all neighbors in ascending chunk number order. The participating nodes collect these chunks until they can recover the original large message (one would have to successfully receive at least _N_ of the chunks for this), and then instruct their neighbors to stop sending new chunks of the stream, because now these nodes can generate the subsequent chunks on their own, having a copy of the original message. Such nodes continue to generate the subsequent chunks of the stream and send them to 
-
-95 
-
-3.3. Overlay Networks and Multicasting Messages 
-
-their neighbors, unless the neighbors in turn indicate that this is no longer necessary. 
+This protocol has already been outlined in 2.6.10: the new (large) broadcast message is split into, say, _N_ one-kilobyte chunks; the sequence of these chunks is augmented to _M ≥ N_ chunks by means of an erasure code such as the Reed–Solomon or a fountain code (e.g., the RaptorQ code [9] [14]), and these _M_ chunks are streamed to all neighbors in ascending chunk number order. The participating nodes collect these chunks until they can recover the original large message (one would have to successfully receive at least _N_ of the chunks for this), and then instruct their neighbors to stop sending new chunks of the stream, because now these nodes can generate the subsequent chunks on their own, having a copy of the original message. Such nodes continue to generate the subsequent chunks of the stream and send them to their neighbors, unless the neighbors in turn indicate that this is no longer necessary.
 
 In this way, a node does not need to download a large message in its entirety before propagating it further. This minimizes broadcast latency, especially when combined with the optimizations described in 3.3.10. 
 
@@ -1619,13 +1331,7 @@ In such cases, the description of the new overlay network may contain an explici
 
 This mechanism does not totally supplant the general mechanism described in 3.3.6 and 3.3.7; rather, both are run in parallel and are used to populate the neighbor list. This is needed to prevent inadvertent splitting of the new overlay network into several unconnected subnetworks. 
 
-3.3.17. Overlay networks within overlay networks. Another interesting case arises in the implementation of TON Payments (a “lightning network” for instant off-chain value transfers; cf. 5.2). In this case, first an overlay network containing all transit nodes of the “lightning network” is constructed. However, some of these nodes have established payment channels in the blockchain; they must always be neighbors in this overlay network, in 
-
-96 
-
-3.3. Overlay Networks and Multicasting Messages 
-
-addition to any “random” neighbors selected by the general overlay network algorithms described in 3.3.6, 3.3.7 and 3.3.8. These “permanent links” to the neighbors with established payment channels are used to run specific lightning network protocols, thus effectively creating an overlay subnetwork (not necessarily connected, if things go awry) inside the encompassing (almost always connected) overlay network. 
+3.3.17. Overlay networks within overlay networks. Another interesting case arises in the implementation of TON Payments (a “lightning network” for instant off-chain value transfers; cf. 5.2). In this case, first an overlay network containing all transit nodes of the “lightning network” is constructed. However, some of these nodes have established payment channels in the blockchain; they must always be neighbors in this overlay network, in addition to any “random” neighbors selected by the general overlay network algorithms described in 3.3.6, 3.3.7 and 3.3.8. These “permanent links” to the neighbors with established payment channels are used to run specific lightning network protocols, thus effectively creating an overlay subnetwork (not necessarily connected, if things go awry) inside the encompassing (almost always connected) overlay network.
 
 ## 4 TON Services and Applications 
 
@@ -1665,13 +1371,7 @@ In the _I_<sup>2</sup> _P_ ecosystem, such “eep-services” are called “eep-
 
 4.1.6. Mixed services: partly off-chain, partly on-chain. Some services might use a mixed approach: do most of the processing off-chain, but also have some on-chain part (for example, to register their obligations towards their users, and vice versa). In this way, part of the state would still be kept in the TON Blockchain (i.e., an immutable public ledger), and any misbehavior of the service or of its users could be punished by smart contracts. 
 
-4.1.7. Example: keeping files off-chain; TON Storage. An example of such a service is given by TON Storage. In its simplest form, it allows users to store files off-chain, by keeping on-chain only a hash of the file to be stored, and possibly a smart contract where some other parties agree to keep the file in question for a given period of time for a pre-negotiated fee. In fact, the file may be subdivided into chunks of some small size (e.g., 1 kilobyte), augmented by an erasure code such as a Reed–Solomon or a fountain code, a 
-
-100 
-
-4.1. TON Service Implementation Strategies 
-
-Merkle tree hash may be constructed for the augmented sequence of chunks, and this Merkle tree hash might be published in the smart contract instead of or along with the usual hash of the file. This is somewhat reminiscent of the way files are stored in a torrent. 
+4.1.7. Example: keeping files off-chain; TON Storage. An example of such a service is given by TON Storage. In its simplest form, it allows users to store files off-chain, by keeping on-chain only a hash of the file to be stored, and possibly a smart contract where some other parties agree to keep the file in question for a given period of time for a pre-negotiated fee. In fact, the file may be subdivided into chunks of some small size (e.g., 1 kilobyte), augmented by an erasure code such as a Reed–Solomon or a fountain code, a Merkle tree hash may be constructed for the augmented sequence of chunks, and this Merkle tree hash might be published in the smart contract instead of or along with the usual hash of the file. This is somewhat reminiscent of the way files are stored in a torrent.
 
 An even simpler form of storing files is completely off-chain: one might essentially create a “torrent” for a new file, and use TON DHT as a “distributed torrent tracker” for this torrent (cf. 3.2.10). This might actually work pretty well for popular files. However, one does not get any availability guarantees. For example, a hypothetical “blockchain Facebook” (cf. 2.9.13), which would opt to keep the profile photographs of its users completely off-chain in such “torrents”, might risk losing photographs of ordinary (not especially popular) users, or at least risk being unable to present these photographs for prolonged periods. The TON Storage technology, which is mostly off-chain, but uses an on-chain smart contract to enforce availability of the stored files, might be a better match for this task. 
 
@@ -1679,13 +1379,7 @@ An even simpler form of storing files is completely off-chain: one might essenti
 
 For example, there might exist a registry (which might also be called a “market” or an “exchange”) where all nodes interested in keeping files of other users publish their contact information, along with their available storage capacity, availability policy, and prices. Those needing these services might look them up there, and, if the other party agrees, create smart contracts in the blockchain and upload files for off-chain storage. In this way a service like TON Storage becomes truly decentralized, because it does not need to rely on any centralized cluster of servers for storing files. 
 
-4.1.9. Example: “fog computing” platforms as decentralized mixed services. Another example of such a decentralized mixed application arises 
-
-101 
-
-4.2. Connecting Users and Service Providers 
-
-when one wants to perform some specific computations (e.g., 3D rendering or training neural networks), often requiring specific and expensive hardware. Then those having such equipment might offer their services through a similar “exchange”, and those needing such services would rent them, with the obligations of the sides registered by means of smart contracts. This is similar to what “fog computing” platforms, such as Golem (https://golem.network/) or SONM (https://sonm.io/), promise to deliver. 
+4.1.9. Example: “fog computing” platforms as decentralized mixed services. Another example of such a decentralized mixed application arises when one wants to perform some specific computations (e.g., 3D rendering or training neural networks), often requiring specific and expensive hardware. Then those having such equipment might offer their services through a similar “exchange”, and those needing such services would rent them, with the obligations of the sides registered by means of smart contracts. This is similar to what “fog computing” platforms, such as Golem (https://golem.network/) or SONM (https://sonm.io/), promise to deliver.
 
 4.1.10. Example: TON Proxy is a fog service. TON Proxy provides yet another example of a fog service, where nodes wishing to offer their services (with or without compensation) as tunnels for ADNL network traffic might register, and those needing them might choose one of these nodes depending on the price, latency and bandwidth offered. Afterwards, one might use payment channels provided by TON Payments for processing micropayments for the services of those proxies, with payments collected, for instance, for every 128 KiB transferred. 
 
@@ -1699,13 +1393,7 @@ Such markets are likely to be implemented as on-chain, off-chain or mixed servic
 
 4.2.1. Example: connecting to TON Payments. For example, if one wants to use TON Payments (cf. 5), the first step would be to nd at least some existing transit nodes of the “lightning network” (cf. 5.2), and establish payment channels with them, if they are willing. Some nodes can be found with the aid of the “encompassing” overlay network, which is supposed to contain all transit lightning network nodes (cf. 3.3.17). However, it is not clear whether these nodes will be willing to create new payment channels. Therefore, a registry is needed where nodes ready to create new links can publish their contact information (e.g., their abstract addresses). 
 
-4.2.2. Example: uploading a file into TON Storage. Similarly, if one wants to upload a file into the TON Storage, she must locate some nodes 
-
-102 
-
-4.3. Accessing TON Services 
-
-willing to sign a smart contract binding them to keep a copy of that file (or of any file below a certain size limit, for that matter). Therefore, a registry of nodes offering their services for storing files is needed. 
+4.2.2. Example: uploading a file into TON Storage. Similarly, if one wants to upload a file into the TON Storage, she must locate some nodes willing to sign a smart contract binding them to keep a copy of that file (or of any file below a certain size limit, for that matter). Therefore, a registry of nodes offering their services for storing files is needed.
 
 4.2.3. On-chain, mixed and off-chain registries. Such a registry of service providers might be implemented completely on-chain, with the aid of a smart contract which would keep the registry in its permanent storage. However, this would be quite slow and expensive. A mixed approach is more efficient, where the relatively small and rarely changed on-chain registry is used only to point out some nodes (by their abstract addresses, or by their public keys, which can be used to locate actual abstract addresses as described in 3.2.12), which provide off-chain (centralized) registry services. 
 
@@ -1745,13 +1433,7 @@ However, this approach would work only for certain DNS smart contracts. It would
 
 Instead, an approach based on general smart contract interfaces and get methods (cf. 4.3.11) is used. Any DNS smart contract must define a “get method” with a “known signature”, which is invoked to look up a key. Since this approach makes sense for other smart contracts as well, especially those providing on-chain and mixed services, we explain it in some detail in 4.3.11. 
 
-4.3.7. Translating a TON DNS domain. Once any full node, acting by itself or on behalf of some light client, can look up entries in the database 
-
-105 
-
-4.3. Accessing TON Services 
-
-of any DNS smart contract, arbitrary TON DNS domain names can be recursively translated, starting from the well-known and fixed root DNS smart contract (account) identifier. 
+4.3.7. Translating a TON DNS domain. Once any full node, acting by itself or on behalf of some light client, can look up entries in the database of any DNS smart contract, arbitrary TON DNS domain names can be recursively translated, starting from the well-known and fixed root DNS smart contract (account) identifier.
 
 For example, if one wants to translate A.B.C, one looks up keys .C, .B.C, and A.B.C in the root domain database. If the first of them is not found, but the second is, and its value is a reference to another DNS smart contract, then A is looked up in the database of that smart contract and the final value is retrieved. 
 
@@ -1801,13 +1483,7 @@ from the wallet client application in a user-friendly way by lling and submittin
 
 4.3.19. “ton-sites” as ton-services supporting an HTTP interface. A ton-site is simply a ton-service that supports an HTTP interface, perhaps along with some other interfaces. This support may be announced in the corresponding TON DNS record. 
 
-4.3.20. Hyperlinks. Notice that the HTML pages returned by ton-sites may contain ton-hyperlinks—that is, references to other ton-sites, smart contracts and accounts by means of specially crafted URI schemes (cf. 4.3.21)— containing either abstract network addresses, account identifiers, or humanreadable TON DNS domains. Then a “ton-browser” might follow such a 
-
-109 
-
-4.3. Accessing TON Services 
-
-hyperlink when the user selects it, detect the interface to be used, and display a user interface form as outlined in 4.3.15 and 4.3.16. 
+4.3.20. Hyperlinks. Notice that the HTML pages returned by ton-sites may contain ton-hyperlinks—that is, references to other ton-sites, smart contracts and accounts by means of specially crafted URI schemes (cf. 4.3.21)— containing either abstract network addresses, account identifiers, or humanreadable TON DNS domains. Then a “ton-browser” might follow such a hyperlink when the user selects it, detect the interface to be used, and display a user interface form as outlined in 4.3.15 and 4.3.16.
 
 4.3.21. Hyperlink URLs may specify some parameters. The hyperlink URLs may contain not only a (TON) DNS domain or an abstract address of the service in question, but also the name of the method to be invoked and some or all of its parameters. A possible URI scheme for this might look as follows: 
 
@@ -1847,13 +1523,7 @@ This smart contract, along with the network protocol used by _A_ and _B_ to upda
 
 To protect against such scenarios, one usually tries to develop trustless payment channel protocols, which do not require the parties to trust each other, and make provisions for punishing any party who would attempt to cheat. 
 
-This is usually achieved with the aid of signatures. The payment channel smart contract knows the public keys of _A_ and _B_ , and it can check their signatures if needed. The payment channel protocol requires the parties to sign the intermediate states and send the signatures to each other. Then, if one of the parties cheats—for instance, pretends that some state of the payment channel never existed—its misbehavior can be proved by showing its signature on that state. The payment channel smart contract acts as an “on-chain arbiter”, able to process complaints of the two parties about each other, and punish the guilty party by confiscating all of its money and 
-
-112 
-
-5.1. Payment Channels 
-
-awarding it to the other party. 
+This is usually achieved with the aid of signatures. The payment channel smart contract knows the public keys of _A_ and _B_ , and it can check their signatures if needed. The payment channel protocol requires the parties to sign the intermediate states and send the signatures to each other. Then, if one of the parties cheats—for instance, pretends that some state of the payment channel never existed—its misbehavior can be proved by showing its signature on that state. The payment channel smart contract acts as an “on-chain arbiter”, able to process complaints of the two parties about each other, and punish the guilty party by confiscating all of its money and awarding it to the other party.
 
 5.1.3. Simple bidirectional synchronous trustless payment channel. Consider the following, more realistic example: Let the state of the payment channel be described by triple ( _δi, i, oi_ ) , where _i_ is the sequence number of the state (it is originally zero, and then it is increased by one when a subsequent state appears), _δi_ is the channel imbalance (meaning that _A_ and _B_ own _a_ + _δi_ and _b − δi_ coins, respectively), and _oi_ is the party allowed to generate the next state (either _A_ or _B_ ). Each state must be signed both by _A_ and _B_ before any further progress can be made. Now, if _A_ wants to transfer _d_ coins to _B_ inside the payment channel, and the current state is _Si_ = ( _δi, i, oi_ ) with _oi_ = _A_ , then it simply creates a new state _Si_ +1 = ( _δi − d, i_ + 1 _, oi_ +1) , signs it, and sends it to _B_ along with its signature. Then _B_ confirms it by signing and sending a copy of its signature to _A_ . After that, both parties have a copy of the new state with both of their signatures, and a new transfer may occur. 
 
@@ -1863,13 +1533,7 @@ When the two parties agree to close the payment channel, they both put their spe
 
 If the other party does not agree to provide its final signature, or simply if it stops responding, it is possible to close the channel unilaterally. For this, the party wishing to do so will invoke the unilateral nalization method, sending to the smart contract its version of the final state, its final signature, and the most recent state having a signature of the other party. After that, the smart contract does not immediately act on the final state received. Instead, it waits for a certain period of time (e.g., one day) for the other party to present its version of the final state. When the other party submits its version and it turns out to be compatible with the already submitted version, the “true” final state is computed by the smart contract and used to distribute the money accordingly. If the other party fails to present its version of the final state to the smart contract, then the money is redistributed according to the only copy of the final state presented. 
 
-If one of the two parties cheats—for example, by signing two different states as final, or by signing two different next states _Si_ +1 and _Si_<sup>_′_</sup> +1<sup>,orby</sup> 
-
-113 
-
-5.1. Payment Channels 
-
-signing an invalid new state _Si_ +1 (e.g., with imbalance _δi_ +1 _< −a_ or _> b_ )— then the other party may submit proof of this misbehavior to a third method of the smart contract. The guilty party is punished immediately by losing its share in the payment channel completely. 
+If one of the two parties cheats—for example, by signing two different states as final, or by signing two different next states _Si_ +1 and _Si_<sup>_′_</sup> +1<sup>,orby</sup> signing an invalid new state _Si_ +1 (e.g., with imbalance _δi_ +1 _< −a_ or _> b_ )— then the other party may submit proof of this misbehavior to a third method of the smart contract. The guilty party is punished immediately by losing its share in the payment channel completely.
 
 This simple payment channel protocol is fair in the sense that any party can always get its due, with or without the cooperation of the other party, and is likely to lose all of its funds committed to the payment channel if it tries to cheat. 
 
@@ -1895,13 +1559,7 @@ The payment channel is nalized by _A_ signing (its version of) the final state o
 
 5.1.7. More sophisticated payment channels. Promises. We will see later in 5.2.4 that the “lightning network” (cf. 5.2), which enables instant money transfers through chains of several payment channels, requires higher degrees of sophistication from the payment channels involved. 
 
-In particular, we want to be able to commit “promises”, or “conditional money transfers”: _A_ agrees to send _c_ coins to _B_ , but _B_ will get the money 
-
-115 
-
-5.1. Payment Channels 
-
-only if a certain condition is fulfilled, for instance, if _B_ can present some string _u_ with Hash ( _u_ ) = _v_ for a known value of _v_ . Otherwise, _A_ can get the money back after a certain period of time. 
+In particular, we want to be able to commit “promises”, or “conditional money transfers”: _A_ agrees to send _c_ coins to _B_ , but _B_ will get the money only if a certain condition is fulfilled, for instance, if _B_ can present some string _u_ with Hash ( _u_ ) = _v_ for a known value of _v_ . Otherwise, _A_ can get the money back after a certain period of time.
 
 Such a promise could easily be implemented on-chain by a simple smart contract. However, we want promises and other kinds of conditional money transfers to be possible off-chain, in the payment channel, because they considerably simplify money transfers along a chain of payment channels existing in the “lightning network” (cf. 5.2.4). 
 
@@ -1913,13 +1571,7 @@ In other words, the payment channel smart contract must be able to work with Mer
 
 5.1.9. TON VM support for “smart” payment channels. The TON VM, used to run the code of TON Blockchain smart contracts, is up to the challenge of executing the smart contracts required for “smart”, or sophisticated, payment channels (cf. 5.1.8). 
 
-At this point the “everything is a bag of cells” paradigm (cf. 2.5.14) becomes extremely convenient. Since all blocks (including the blocks of the ephemeral payment channel blockchain) are represented as bags of cells (and described by some algebraic data types), and the same holds for messages and Merkle proofs as well, a Merkle proof can easily be embedded into an 
-
-116 
-
-5.1. Payment Channels 
-
-inbound message sent to the payment channel smart contract. The “hash condition” of the Merkle proof will be checked automatically, and when the smart contract accesses the “Merkle proof” presented, it will work with it as if it were a value of the corresponding algebraic data type—albeit incomplete, with some subtrees of the tree replaced by special nodes containing the Merkle hash of the omitted subtree. Then the smart contract will work with that value, which might represent, for instance, a block of the payment channel (virtual) blockchain along with its state, and will evaluate the ev_block function (cf. 2.2.6) of that blockchain on this block and the previous state. Then either the computation nishes, and the final state can be compared with that asserted in the block, or an “absent node” exception is thrown while attempting to access an absent subtree, indicating that the Merkle proof is invalid. 
+At this point the “everything is a bag of cells” paradigm (cf. 2.5.14) becomes extremely convenient. Since all blocks (including the blocks of the ephemeral payment channel blockchain) are represented as bags of cells (and described by some algebraic data types), and the same holds for messages and Merkle proofs as well, a Merkle proof can easily be embedded into an inbound message sent to the payment channel smart contract. The “hash condition” of the Merkle proof will be checked automatically, and when the smart contract accesses the “Merkle proof” presented, it will work with it as if it were a value of the corresponding algebraic data type—albeit incomplete, with some subtrees of the tree replaced by special nodes containing the Merkle hash of the omitted subtree. Then the smart contract will work with that value, which might represent, for instance, a block of the payment channel (virtual) blockchain along with its state, and will evaluate the ev_block function (cf. 2.2.6) of that blockchain on this block and the previous state. Then either the computation nishes, and the final state can be compared with that asserted in the block, or an “absent node” exception is thrown while attempting to access an absent subtree, indicating that the Merkle proof is invalid.
 
 In this way, the implementation of the verification code for smart payment channel blockchains turns out to be quite straightforward using TON Blockchain smart contracts. One might say that the TON Virtual Machine comes with built-in support for checking the validity of other simple blockchains. The only limiting factor is the size of the Merkle proof to be incorporated into the inbound message to the smart contract (i.e., into the transaction). 
 
@@ -1927,13 +1579,7 @@ In this way, the implementation of the verification code for smart payment chann
 
 While this may seem somewhat convoluted, it is not much harder to understand and implement than the “promises” discussed in 5.1.7. Essentially, instead of promising to pay _c_ coins to the other party if a solution to some hash problem is presented, _A_ promises to pay up to _c_ coins to _B_ according to the final settlement of some other (virtual) payment channel blockchain. Generally speaking, this other payment channel blockchain need not even be between _A_ and _B_ ; it might involve some other parties, say, _C_ and _D_ , willing to commit _c_ and _d_ coins into their simple payment channel, respectively. (This possibility is exploited later in 5.2.5.) 
 
-If the encompassing payment channel is asymmetric, two promises need to be committed into the two workchains: _A_ will promise to pay _−δ_ coins to _B_ if the final settlement of the “internal” simple payment channel yields a negative final imbalance _δ_ with 0 _≤−δ ≤ c_ ; and _B_ will have to promise to pay _δ_ to _A_ if _δ_ is positive. On the other hand, if the encompassing 
-
-117 
-
-5.2. Payment Channel Network, or “Lightning Network” 
-
-payment channel is symmetric, this can be done by committing a single “simple payment channel creation” transaction with parameters ( _c, d_ ) into the single payment channel blockchain by _A_ (which would freeze _c_ coins belonging to _A_ ), and then committing a special “confirmation transaction” by _B_ (which would freeze _d_ coins of _B_ ). 
+If the encompassing payment channel is asymmetric, two promises need to be committed into the two workchains: _A_ will promise to pay _−δ_ coins to _B_ if the final settlement of the “internal” simple payment channel yields a negative final imbalance _δ_ with 0 _≤−δ ≤ c_ ; and _B_ will have to promise to pay _δ_ to _A_ if _δ_ is positive. On the other hand, if the encompassing payment channel is symmetric, this can be done by committing a single “simple payment channel creation” transaction with parameters ( _c, d_ ) into the single payment channel blockchain by _A_ (which would freeze _c_ coins belonging to _A_ ), and then committing a special “confirmation transaction” by _B_ (which would freeze _d_ coins of _B_ ).
 
 We expect the internal payment channel to be extremely simple (e.g., the simple synchronous payment channel discussed in 5.1.3), to minimize the size of Merkle proofs to be submitted. The external payment channel will have to be “smart” in the sense described in 5.1.7. 
 
@@ -1961,25 +1607,13 @@ Some minor details are omitted in this description. For example, these promises 
 
 5.2.5. Virtual payment channels inside a chain of payment channels. Now suppose that _A_ and _E_ expect to make a lot of payments to each other. They might create a new payment channel between them in the blockchain, but this would still be quite expensive, because some funds would be locked in this payment channel. Another option would be to use chain money transfers described in 5.2.4 for each payment. However, this would involve a lot of network activity and a lot of transactions in the virtual blockchains of all payment channels involved. 
 
-An alternative is to create a virtual payment channel inside the chain linking _A_ to _E_ in the payment channel network. For this, _A_ and _E_ create 
-
-119 
-
-5.2. Payment Channel Network, or “Lightning Network” 
-
-a (virtual) blockchain for their payments, as if they were going to create a payment channel in the blockchain. However, instead of creating a payment channel smart contract in the blockchain, they ask all intermediate payment channels—those linking _A_ to _B_ , _B_ to _C_ , etc.—to create simple payment channels inside them, bound to the virtual blockchain created by _A_ and _E_ (cf. 5.1.10). In other words, now a promise to transfer money according to the final settlement between _A_ and _E_ exists inside every intermediate payment channel. 
+An alternative is to create a virtual payment channel inside the chain linking _A_ to _E_ in the payment channel network. For this, _A_ and _E_ create a (virtual) blockchain for their payments, as if they were going to create a payment channel in the blockchain. However, instead of creating a payment channel smart contract in the blockchain, they ask all intermediate payment channels—those linking _A_ to _B_ , _B_ to _C_ , etc.—to create simple payment channels inside them, bound to the virtual blockchain created by _A_ and _E_ (cf. 5.1.10). In other words, now a promise to transfer money according to the final settlement between _A_ and _E_ exists inside every intermediate payment channel.
 
 If the virtual payment channel is unidirectional, such promises can be implemented quite easily, because the final imbalance _δ_ is going to be nonpositive, so simple payment channels can be created inside intermediate payment channels in the same order as described in 5.2.4. Their expiration times can also be set in the same way. 
 
 If the virtual payment channel is bidirectional, the situation is slightly more complicated. In that case, one should split the promise to transfer _δ_ coins according to the final settlement into two half-promises, as explained in 5.1.10: to transfer _δ_<sup>_−_</sup> = max(0 _, −δ_ ) coins in the forward direction, and to transfer _δ_<sup>+</sup> = max(0 _, δ_ ) in the backward direction. These half-promises can be created in the intermediate payment channels independently, one chain of half-promises in the direction from _A_ to _E_ , and the other chain in the opposite direction. 
 
-5.2.6. Finding paths in the lightning network. One point remains undiscussed so far: how will _A_ and _E_ nd a path connecting them in the payment network? If the payment network is not too large, an OSPF-like protocol can be used: all nodes of the payment network create an overlay network (cf. 3.3.17), and then every node propagates all available link (i.e., participating payment channel) information to its neighbors by a gossip protocol. Ultimately, all nodes will have a complete list of all payment channels participating in the payment network, and will be able to nd the shortest paths by themselves—for example, by applying a version of Dijkstra's algorithm modified to take into account the “capacities” of the payment channels involved (i.e., the maximal amounts that can be transferred along them). Once a candidate path is found, it can be probed by a special ADNL datagram containing the full path, and asking each intermediate node to confirm the existence of the payment channel in question, and to forward this datagram further according to the path. After that, a chain can be constructed, and a protocol for chain transfers (cf. 5.2.4), or for creating a virtual payment 
-
-120 
-
-5.2. Payment Channel Network, or “Lightning Network” 
-
-channel inside a chain of payment channels (cf. 5.2.5), can be run. 
+5.2.6. Finding paths in the lightning network. One point remains undiscussed so far: how will _A_ and _E_ nd a path connecting them in the payment network? If the payment network is not too large, an OSPF-like protocol can be used: all nodes of the payment network create an overlay network (cf. 3.3.17), and then every node propagates all available link (i.e., participating payment channel) information to its neighbors by a gossip protocol. Ultimately, all nodes will have a complete list of all payment channels participating in the payment network, and will be able to nd the shortest paths by themselves—for example, by applying a version of Dijkstra's algorithm modified to take into account the “capacities” of the payment channels involved (i.e., the maximal amounts that can be transferred along them). Once a candidate path is found, it can be probed by a special ADNL datagram containing the full path, and asking each intermediate node to confirm the existence of the payment channel in question, and to forward this datagram further according to the path. After that, a chain can be constructed, and a protocol for chain transfers (cf. 5.2.4), or for creating a virtual payment channel inside a chain of payment channels (cf. 5.2.5), can be run.
 
 5.2.7. Optimizations. Some optimizations might be done here. For example, only transit nodes of the lightning network need to participate in the OSPF-like protocol discussed in 5.2.6. Two “leaf” nodes wishing to connect through the lightning network would communicate to each other the lists of transit nodes they are connected to (i.e., with which they have established payment channels participating in the payment network). Then paths connecting transit nodes from one list to transit nodes from the other list can be inspected as outlined above in 5.2.6. 
 
@@ -2015,13 +1649,7 @@ The TON infrastructure allows for specialized light client wallet and “tonbrow
 
 - [9] M. Luby, A. Shokrollahi, et al., RaptorQ forward error correction scheme for object delivery, IETF RFC 6330, https://tools.ietf.org/ html/rfc6330, 2011. 
 
-- [10] P. Maymounkov, D. Mazières, Kademlia: A peer-to-peer information system based on the XOR metric, in IPTPS '01 revised papers from the First International Workshop on Peer-to-Peer Systems, 
-
-123 
-
-References 
-
-p. 53–65, available at http://pdos.csail.mit.edu/~petar/papers/ maymounkov-kademlia-lncs.pdf, 2002. 
+- [10] P. Maymounkov, D. Mazières, Kademlia: A peer-to-peer information system based on the XOR metric, in IPTPS '01 revised papers from the First International Workshop on Peer-to-Peer Systems, p. 53–65, available at http://pdos.csail.mit.edu/~petar/papers/ maymounkov-kademlia-lncs.pdf, 2002.
 
 - [11] A. Miller, Yu Xia, et al., The honey badger of BFT protocols, Cryptology e-print archive 2016/99, https://eprint.iacr.org/2016/ 199.pdf, 2016. 
 

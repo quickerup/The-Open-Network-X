@@ -14,6 +14,17 @@ don't duplicate the work.
 
 ## Changelog
 
+### 2026-09-09
+
+- **ADR-0008** — Consensus and Validator Operation (`docs/specification/consensus.md`).
+- **ADR-0009**–**ADR-0011** — Networking Sub-specifications: ADNL transport and RLDP (`networking-adnl.md`), Distributed Hash Table (`networking-dht.md`), and Overlay Networks / Propagation (`networking-overlay.md`).
+- **ADR-0012** — Dynamic Sharding (`docs/specification/sharding.md`).
+- **ADR-0013** — Economics (`docs/specification/economics.md`).
+- **ADR-0014** — Payment Channels (`docs/specification/payment-channels.md`).
+- **ADR-0015** — Adopted Apache-2.0 as the repository license (`LICENSE`).
+- Reconstructed and resolved all 62 mid-sentence page-break artifacts in `whitepaper.md`.
+- Updated `crates/onx-data-structures` `Message` type with `extra_currencies` field and updated `ci.yml` `push` trigger to `main`.
+
 ### 2026-09-08
 
 - Added `INSTRUCTIONS.md` and the reference white paper (`whitepaper.md`).
@@ -39,7 +50,7 @@ don't duplicate the work.
   in full: workchain identifiers, account IDs, full addresses, ShardIdent bitwise prefix encoding,
   message structures, and block headers with domain-separated SHA-256 hashing.
 - Added `.github/workflows/ci.yml` running `cargo fmt`, `cargo clippy`, `cargo build`,
-  and `cargo test` on pull requests.
+  and `cargo test` on pull requests and pushes to `main`.
 - Reformatted `README.md` with proper Markdown structure and updated status diagram.
 - Added `CONTRIBUTING.md` codifying the spec-before-code workflow, per-layer crate
   structure, malformed-input and domain-separation conventions, ADR expectations, and
@@ -85,178 +96,65 @@ the answer.
 
 - [x] **Implement `docs/specification/state-model.md` in code.**
       A crate for the account state record layout, cell binary serialization,
-      domain-separated cell hashing, and Merkle proof structures. Depends on
-      `onx-primitives` and `onx-data-structures`.
+      domain-separated cell hashing, and Merkle proof structures.
 - [x] **Write the Transactions and Messages specification**
-      (`docs/specification/transactions.md` + ADR-0005). Resolves **ONX-ARCH-004**
-      (cross-shard message order, replay, and failure semantics).
+      (`docs/specification/transactions.md` + ADR-0005). Resolves **ONX-ARCH-004**.
       - Message value model as `(currency_id, value)` pairs (§2.4.5) integrated
-        with `extra_currencies`, closing the gap flagged in the PR #8 review
-        where `data-structures.md` listed this field but `crates/onx-data-structures`'
-        `Message` type didn't implement it — **the crate itself still needs updating
-        to match; see "Next" below.**
-      - External messages ("messages from nowhere", §2.4.6) and tentative execution
-        admission rules.
-      - Output-queue-only model (§2.4.16–§2.4.17) and per-account FIFO delivery order.
-      - Hypercube routing ("slow path", §2.4.19) adoption and fast path deferral (**ONX-ARCH-011**).
-      - Double-delivery prevention via tracking processed message hashes (§2.4.23).
-
-### Next
-
-- [ ] Implement the transactions/messages layer in code now that
-      `docs/specification/transactions.md` (ADR-0005) exists. Includes updating
-      `crates/onx-data-structures`' `Message` type to add the `extra_currencies`
-      field the spec now formalizes (§4.1) — its wire layout currently omits it.
+        with `extra_currencies` in `crates/onx-data-structures`.
 - [x] **Write the Blocks and masterchain coupling specification**
-      (`docs/specification/blocks.md` + ADR-0006) — architecture sequence
-      item 5. Separates structural block validity (deterministic, defined
-      now) from BFT/consensus validity and reliability (deferred to the
-      future Consensus spec, ONX-ARCH-005). Defines the `Masterchain Block
-      Extra` shard-hash commitment structure, and assigns the four
-      split/merge announcement flags (`SPLIT_PREPARE`/`SPLIT_COMMIT`/
-      `MERGE_PREPARE`/`MERGE_COMMIT`) bit positions within `BlockHeader.flags`
-      — but explicitly defers their load-based trigger conditions and
-      validator task-group reassignment to the future Dynamic Sharding spec
-      (ONX-ARCH-007), so neither spec silently assumes the other owns them.
-      Surfaced a real gap as **ONX-ARCH-013**: `data-structures.md`'s
-      `BlockHeader` has only one `prev_ref_hash` field, but a merge block
-      needs two parent references — not resolved here, tracked as an open
-      question requiring its own `data-structures.md` amendment.
-- [ ] Implement `docs/specification/blocks.md` in code once ONX-ARCH-013
-      (merge-block parent references) is resolved — the non-split/non-merge
-      structural validity rules could reasonably be implemented sooner,
-      since they don't depend on that open question.
+      (`docs/specification/blocks.md` + ADR-0006).
 - [x] **Write the Execution (virtual machine) specification**
-      (`docs/specification/execution.md` + ADR-0007) — architecture sequence
-      item 6. Resolves part of **ONX-ARCH-006** (VM rules per workchain).
-      Defines the execution contract (inputs/outputs/gas/exceptions),
-      required arithmetic/data semantic categories, and a closed five-member
-      exception set — but explicitly defers concrete opcode-level
-      instruction encoding and gas pricing to a future "TVM Instruction Set"
-      artifact, since no bytecode-level ISA exists in the reference material
-      to draw from.
-      **Decision recorded: accept** the Merkle-proof/pruned-branch VM
-      primitive now (§3.5) — assigns a meaning to `state-model.md`'s
-      previously-undefined `Cell.is_special_flag` bit and reserves an
-      `AbsentNode` exception, unblocking **ONX-ARCH-009** (Payment channels)
-      from the Execution side without committing to payment-channel
-      semantics themselves.
-- [ ] Write the "TVM Instruction Set" specification (concrete opcodes and
-      gas price table) that `docs/specification/execution.md` §3.1 defers to
-      — required before Execution can be implemented in code.
+      (`docs/specification/execution.md` + ADR-0007).
+- [x] **Write the Consensus and validator operation specification**
+      (`docs/specification/consensus.md` + ADR-0008).
+- [x] **Write the Networking sub-specifications**
+      (`docs/specification/networking-adnl.md`, `networking-dht.md`, `networking-overlay.md` + ADR-0009–ADR-0011).
+- [x] **Write the Dynamic sharding specification**
+      (`docs/specification/sharding.md` + ADR-0012).
+- [x] **Write the Economics specification**
+      (`docs/specification/economics.md` + ADR-0013).
+- [x] **Write the Payment channels specification**
+      (`docs/specification/payment-channels.md` + ADR-0014).
 
-### Later (depend on consensus existing)
+### Next (Spec completion & blocking code items)
 
-- [ ] Write the **Consensus and validator operation** specification —
-      validator lifecycle, assignment, quorum rules, finality, invalid-block
-      evidence — architecture sequence item 7. Resolves **ONX-ARCH-005**.
-      **(whitepaper.md §2.6)** covers considerably more ground than the one-line
-      summary suggests, including: validator election and stake-weighting
-      (§2.6.7), nominators and fishermen as distinct non-validator roles for
-      capital-provision and invalidity-reporting respectively (§2.6.3–§2.6.4,
-      directly relevant to the vertical-block-correction mechanism ADR-0001
-      already commits to preserving), rotating validator task groups per
-      shard (§2.6.8–§2.6.9), block-candidate propagation and BFT signature
-      thresholds (§2.6.10–§2.6.12), a validator signature's "depth" and
-      partial/late-signature reward decay (§2.6.20–§2.6.21), and the
-      relative-vs-recursive block reliability distinction with a bounded
-      (e.g. two-month in the reference) challenge window before a block is
-      no longer reconsidered (§2.6.26–§2.6.28) — this last point is a
-      concrete finality rule ONX-ARCH-005 needs an explicit answer for.
-- [ ] Write a **Networking** specification — architecture sequence item 8,
-      **(whitepaper.md §3, resolves ONX-ARCH-010)**. The reference treats this as
-      three distinct, separately specifiable sub-layers rather than one
-      protocol, and the spec (or specs) should probably follow that split:
-      - **Peer identity and transport (ADNL)** — 256-bit abstract addresses
-        derived from a hashed, serialized key description, channel/tunnel
-        identifiers, and the reliable large-datagram protocol built on top
-        (whitepaper.md §3.1);
-      - **Peer/service discovery (DHT)** — a Kademlia-like distributed hash
-        table keyed by 256-bit hashes, used to locate nodes, services, and
-        tunnel entry points (whitepaper.md §3.2);
-      - **Overlay networks and propagation** — per-shard gossip/broadcast
-        overlays, including the streaming/erasure-coded broadcast protocol
-        used for block-candidate propagation described alongside consensus
-        in §2.6.10 (whitepaper.md §3.3).
-- [ ] Write the **Dynamic sharding** specification — shard-tree invariants,
-      split/merge lifecycle, state migration, validator responsibility —
-      architecture sequence item 9. Resolves **ONX-ARCH-007** and the
-      remainder of **ONX-ARCH-006** (initial workchain set). **(whitepaper.md §2.7)**
-      gives concrete mechanics to decide on or explicitly deviate from:
-      shard configuration as masterchain state organized as a binary tree
-      per workchain (§2.7.1–§2.7.2); split/merge changes announced several
-      blocks in advance via header flags before being committed (§2.7.3);
-      bounded distance limits on how far the active shard configuration may
-      drift from the configuration a validator task group was assigned
-      under, before a split/merge is simply refused (§2.7.5); and formal
-      load-based trigger conditions for splitting and merging (§2.7.6,
-      §2.7.8) that a deterministic implementation needs to pin down
-      precisely, not leave as "when load is high enough."
-- [ ] Write the **Economics** specification — Onyx supply, denomination,
-      fees, rewards, staking, penalties — architecture sequence item 10.
-      Resolves **ONX-ARCH-008**. Deliberately last: `INSTRUCTIONS.md` §18
-      requires the consensus and resource-accounting model to be specified
-      first. **(whitepaper.md Appendix A)** gives TON's own concrete reference
-      figures the ONX spec must explicitly accept, adapt, or reject rather
-      than silently inherit: a 10^9-unit subdivision (with a further
-      2^-16 sub-unit, "specks," for gas-price rounding), an initial supply
-      cap, and an inflation model tying validator rewards to a percentage
-      of stake per year with slashed stakes partly burned (deflationary).
-- [ ] Write a **Payment channels (TON Payments)** specification —
-      **(whitepaper.md §5, resolves new ONX-ARCH-009)**. This is not currently
-      tracked anywhere in this roadmap or in architecture.md, despite being
-      an entire chapter of the reference: point-to-point trustless payment
-      channels backed by an on-chain arbiter smart contract (§5.1.1–§5.1.4),
-      an asynchronous two-workchain variant avoiding round-trip
-      confirmation delay (§5.1.5), conditional transfers/"promises"
-      enabling channels to be chained (§5.1.7), and a payment-channel
-      network ("lightning network") for multi-hop transfers with path
-      finding (§5.2). Depends on Execution existing first, since §5.1.9
-      is explicit that this needs VM support for embedding and verifying
-      Merkle proofs of an inner (virtual) blockchain's state transitions —
-      see the note on the Execution item above.
+- [ ] Resolve **ONX-ARCH-013**: `BlockHeader` only has one `prev_ref_hash`, but merge blocks need two parent references. Requires a `data-structures.md` amendment before `blocks.md` can be implemented in code.
+- [ ] Write the "TVM Instruction Set" specification (concrete opcodes and gas pricing) that `docs/specification/execution.md` §3.1 defers to.
+- [ ] Define the pruned-branch / special-cell sub-encoding reserved by `execution.md` §3.5.
 
-### Out of scope for now
+### Code Implementation (in dependency order)
 
-Not tasks — an explicit note, per `INSTRUCTIONS.md` §22–23 ("build
-incrementally," "do not optimize prematurely"), that **whitepaper.md §4 (TON
-Services and Applications)** — TON DNS, TON Storage as a general file-hosting
-service, TON Proxy, and ton-services/ton-sites/ton-browser — describes an
-application/ecosystem layer built on top of the blockchain, network, and
-payments layers above. None of it should be started before Consensus,
-Networking, Sharding, Payments, and Economics exist; adding it earlier would
-be designing for requirements this project isn't at yet. This is distinct
-from the archival storage of blocks and state already implied by the
-existing Networking item (architecture.md's "Networking and storage" domain)
-— that's node-operational storage, not the TON Storage *service*.
+- [ ] Implement `transactions.md` in code (new `onx-transactions` crate) — resolves `TODO(ONX-ARCH-004)` in `message.rs`.
+- [ ] Implement `blocks.md` in code once ONX-ARCH-013 is resolved.
+- [ ] Implement the Execution / VM crate once the TVM Instruction Set and special-cell encoding specs are written.
+- [ ] Implement a networking crate (ADNL transport + DHT discovery) per existing specs.
+- [ ] Implement dynamic sharding (shard-tree split/merge) once blocks are implemented.
+- [ ] Implement payment channels once Execution supports Merkle-proof verification.
 
-### Project infrastructure (can be picked up any time, independent of the above)
+### Testing & Tooling
 
-- [x] ~~Set up CI (`cargo build`, `cargo test`, `cargo clippy`, `cargo fmt --check`)~~ —
-      done in `.github/workflows/ci.yml`, though its `push` trigger only watches a
-      `work` branch, not `main`; worth fixing.
-- [ ] Decide and record a license (`README.md` currently says this is
-      still pending — see [License](README.md#license)).
-- [x] ~~Add a `CONTRIBUTING.md` codifying the workflow this document assumes~~ — done,
-      see [`CONTRIBUTING.md`](CONTRIBUTING.md).
+- [ ] Add cross-crate integration tests.
+- [ ] Add a fuzzing harness (`cargo-fuzz`) for binary deserializers (`Cell`, `BagOfCells`, `Message`, `BlockHeader`).
+- [ ] Add benchmarks (`Criterion`) for hashing/serialization primitives.
+- [ ] Add code-coverage reporting (e.g. `cargo-tarpaulin`) to CI.
+- [ ] Build a minimal in-memory multi-node simulation harness.
+- [ ] Add `scripts/setup-dev.sh` to install pinned toolchain and run CI checks locally.
+
+### Project infrastructure
+
+- [x] Set up CI (`cargo build`, `cargo test`, `cargo clippy`, `cargo fmt --check`) — done in `.github/workflows/ci.yml` watching `main`.
+- [x] Adopt Apache License 2.0 (`LICENSE` file added, ADR-0015 accepted).
+- [x] Add `CONTRIBUTING.md` codifying the workflow.
 
 ## Notes on prioritization
 
 - **Spec before code, always.** Per `INSTRUCTIONS.md` §1 and §23, a layer's
   specification (and ADR, where an interpretation was required) must exist
-  before its implementation is started. The ordering above reflects that:
-  data-structures and state-model already have specs and are therefore ready
-  for code now, while transactions/blocks/execution/consensus/networking/
-  sharding/economics need their specs written first.
+  before its implementation is started.
 - **Consensus-critical layers are sequenced by dependency, not by
   difficulty.** Execution depends on state and transactions being defined;
   consensus depends on execution's resource accounting; networking is
   deliberately kept separate from consensus validity per the architecture
   baseline's required boundaries; payment channels depend on execution
-  supporting Merkle-proof verification (whitepaper.md §5.1.9); economics is last
-  because it depends on the resource-accounting and consensus model being
-  settled (`INSTRUCTIONS.md` §18).
-- This ordering is a recommendation, not a rule enforced anywhere in code.
-  If you have a good reason to reorder something, open an issue or PR
-  discussing it — per project philosophy, deviations should be explicit and
-  documented, not silent.
+  supporting Merkle-proof verification; economics is last because it depends on
+  the resource-accounting and consensus model being settled (`INSTRUCTIONS.md` §18).

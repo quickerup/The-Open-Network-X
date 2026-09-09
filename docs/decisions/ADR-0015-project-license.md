@@ -1,13 +1,11 @@
-# ADR-0015 — Project License Proposal
+# ADR-0015 — Project License Selection
 
-**Status:** Proposed — requires maintainer review; this ADR does not select a license or add a `LICENSE` file.  
+**Status:** Accepted
 **Date:** 2026-09-09
 
 ## Context
 
-README currently describes ONX as an independent implementation effort and leaves
-its license undecided. A license must preserve that independent-decision posture
-while making source reuse and contribution expectations clear.
+README currently describes ONX as an independent implementation effort. A license must preserve that independent-decision posture while making source reuse and contribution expectations clear.
 
 ## Survey
 
@@ -25,17 +23,17 @@ projects' repository license files are the source for the classifications above.
 
 ## Problem
 
-ONX needs a future license that is understandable to independent implementers,
+ONX needs a license that is understandable to independent implementers,
 does not suggest authority over another network, and limits legal ambiguity for
 contributors. It should not be chosen implicitly by copying a comparable project.
 
-## Proposal
+## Decision
 
-After review, adopt **Apache-2.0** for the repository. It is a permissive license
+Adopt **Apache-2.0** for the repository. It is a permissive license
 with an express patent grant and termination clause, a NOTICE mechanism for
 attribution, and clear terms for an independently governed protocol
 implementation. It does not impose network-source publication obligations, which
-keeps independent experimentation possible while the project is still specifying
+keeps independent experimentation possible while the project is specifying
 its protocol.
 
 ## Alternatives Considered
@@ -51,11 +49,8 @@ its protocol.
 
 ## Consequences
 
-If accepted, a follow-up change must add the canonical Apache-2.0 text, update
-README, and establish any required NOTICE policy. Until then, no license is
-selected and this ADR must not be treated as permission to add a `LICENSE` file.
+The canonical `LICENSE` file containing Apache License Version 2.0 has been added to the root of the repository, and `README.md` is updated accordingly.
 
 ## Tests
 
-No code changes. Review verifies the eventual license text and repository
-metadata exactly match the accepted decision.
+Review verifies that `LICENSE` is present and contains the exact canonical Apache-2.0 text and repository metadata matches.

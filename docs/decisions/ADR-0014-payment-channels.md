@@ -1,38 +1,47 @@
-# ADR-0014 — Payment Channels
+# ADR-0014 — Payment Channels and Payment Network
 
 **Status:** Accepted  
 **Date:** 2026-09-09
 
 ## Context
 
-Architecture sequence work requires this protocol layer to be explicit before implementation. The historical reference supplies mechanisms, but not a complete ONX implementation contract.
+Architecture sequence item 11 (Payment Channels) requires the specification of off-chain point-to-point payment channels, on-chain arbiter settlement lifecycles, conditional promises (HTLCs), embedded Merkle-proof state transition verification, and multi-hop lightning network routing.
 
 ## Reference
 
-See `docs/specification/payment-channels.md` §1 and its cited `whitepaper.md` subsections.
+- `whitepaper.md` §5 (Payment Channels and Payment Network, §5.1–§5.2).
+- `docs/specification/payment-channels.md` (Payment Channels specification).
+- `docs/specification/execution.md` §3.5 (Merkle-proof / pruned-branch cell reservation).
+- `docs/specification/state-model.md` (Cell serialization and Merkle proofs).
 
 ## Problem
 
-Without a separately reviewable decision, a future implementation could silently inherit undefined behavior from another system or confuse transport, consensus, and economic policy.
+High-frequency micro-transactions cannot be processed on-chain without causing state bloat and execution throughput bottlenecks. Off-chain payment channels resolve this, but require trustless on-chain arbiter contracts, challenge windows, fraud penalties, and Merkle-proof verification to guarantee safety against stale-state claims.
 
 ## Decision
 
-Accept `docs/specification/payment-channels.md` as ONX's draft specification for this layer. Its ONX interpretations are intentional: values and wire layouts not fully supported by the reference are documented as adaptations or deferrals, and no implementation is authorized beyond the document's stated dependencies.
+Accept `docs/specification/payment-channels.md` as ONX's specification for payment channels:
+1. On-chain arbiter lifecycle supporting cooperative closure, unilateral challenge settlement with a 24-hour challenge window ($\Delta t$), and a $100\%$ fraud penalty for submitting stale states.
+2. Bilaterally signed state updates ($S_k$) with 64-bit sequence counters and balance conservation invariants ($a_k + b_k = C$).
+3. Conditional promises (HTLCs) with SHA-256 hash locks and decremented time locks for atomic multi-hop payment network routing.
+4. Embedded Merkle-proof state transition verification leveraging `execution.md` §3.5's special cell primitive (`Cell.is_special_flag`, `AbsentNode` exception) to evaluate virtual blockchain transitions on-chain.
 
 ## Alternatives Considered
 
-1. Copy an existing implementation's behavior: rejected because ONX is independently specified.
-2. Leave this layer implicit: rejected because it would make consensus-relevant behavior unauditable.
-3. Specify only the reference prose: rejected because ONX needs deterministic malformed-input and test requirements.
+1. **On-chain micro-transactions:** simpler, but causes severe chain state bloat and high transaction fee overhead.
+2. **Trusted payment intermediaries:** avoids complex smart contract arbiters, but compromises the decentralized, trustless architecture of ONX.
+3. **Omitting fraud penalties:** allows unilateral challenge, but fails to deter dishonest parties from submitting old favorable state balances.
 
 ## Consequences
 
-The layer has a stable review target and no production code is added. Future code must implement the whole specified structure and its negative tests; it must not treat this ADR as permission to fill deferred details ad hoc.
+- Payment channels and multi-hop lightning routing are fully specified with TL structures, big-endian layouts, and rejection rules.
+- Verification relies explicitly on the Execution layer's Merkle-proof special cell primitive.
+- Implementation will follow execution and transaction crates.
 
 ## Implementation
 
-Documentation only. See the specification's dependency and serialization sections before any crate is created.
+Documentation and specification complete. Implementation will follow VM/execution crates.
 
 ## Tests
 
-See `docs/specification/payment-channels.md` §6 for the required future test plan.
+See `docs/specification/payment-channels.md` §6 for the complete test plan (cooperative close, unilateral challenge windows, fraud penalties, HTLC preimages/timeouts, and embedded Merkle-proof VM verification).

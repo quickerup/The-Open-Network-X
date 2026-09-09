@@ -95,6 +95,7 @@ Specification work completed so far, with accompanying architecture decision rec
 | Dynamic sharding | `docs/specification/sharding.md` | `ADR-0012` |
 | Economics | `docs/specification/economics.md` | `ADR-0013` |
 | Payment channels | `docs/specification/payment-channels.md` | `ADR-0014` |
+| Project license | — | `ADR-0015` |
 
 The `crates/onx-primitives`, `crates/onx-data-structures`, and `crates/onx-state-model` crates cover the protocol-primitives, data-structures, and state-model specifications above.
 
@@ -116,12 +117,13 @@ flowchart TD
     E["Transactions & messages<br/>ADR-0005, spec only"]:::specOnly
     F["Blocks & masterchain coupling<br/>ADR-0006, spec only"]:::specOnly
     G["Execution / VM<br/>ADR-0007, spec only"]:::specOnly
-    H["Consensus & validator operation"]:::todo
-    I["Networking"]:::todo
-    J["Dynamic sharding"]:::todo
-    K["Economics"]:::todo
+    H["Consensus & validator operation<br/>ADR-0008, spec only"]:::specOnly
+    I["Networking<br/>ADR-0009–ADR-0011, spec only"]:::specOnly
+    J["Dynamic sharding<br/>ADR-0012, spec only"]:::specOnly
+    K["Economics<br/>ADR-0013, spec only"]:::specOnly
+    L["Payment channels<br/>ADR-0014, spec only"]:::specOnly
 
-    A --> B --> C --> D --> E --> F --> G --> H --> I --> J --> K
+    A --> B --> C --> D --> E --> F --> G --> H --> I --> J --> K --> L
 
     classDef done fill:#2f9e44,stroke:#2f9e44,color:#fff
     classDef specOnly fill:#f08c00,stroke:#f08c00,color:#fff
@@ -137,11 +139,13 @@ See [`ROADMAP.md`](ROADMAP.md) for the full changelog and a prioritized, up-for-
 .
 ├── README.md
 ├── INSTRUCTIONS.md          # Development principles for this repository
+├── LICENSE                  # Apache License 2.0
 ├── whitepaper.md            # Reference white paper (unmodified)
 ├── Cargo.toml               # Rust workspace
 ├── crates/
 │   ├── onx-primitives/      # Canonical encoding, hashing, and signatures
-│   └── onx-data-structures/ # ShardIdent, account/workchain IDs, messages, block headers
+│   ├── onx-data-structures/ # ShardIdent, account/workchain IDs, messages, block headers
+│   └── onx-state-model/     # Account states, cell serialization, Merkle proofs
 └── docs/
     ├── specification/       # ONX protocol specifications
     └── decisions/           # Architecture decision records (ADRs)
@@ -168,4 +172,4 @@ Open Network X is an independent project. ONX, Open Network X, and Onyx should n
 
 ## License
 
-License selection is pending review of [ADR-0015](docs/decisions/ADR-0015-project-license.md); no `LICENSE` file has been adopted yet. Individual reference materials may have their own copyright and licensing requirements — see `whitepaper.md` for the applicable source and attribution information.
+Open Network X is licensed under the Apache License, Version 2.0. See [`LICENSE`](LICENSE) for the full license text (accepted per [ADR-0015](docs/decisions/ADR-0015-project-license.md)). Individual reference materials may have their own copyright and licensing requirements — see `whitepaper.md` for the applicable source and attribution information.
