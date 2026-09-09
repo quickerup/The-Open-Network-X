@@ -30,6 +30,8 @@ pub enum StateModelError {
     },
     /// Merkle proof verification failure.
     InvalidMerkleProof(String),
+    /// Persistent storage error.
+    StorageError(String),
 }
 
 impl fmt::Display for StateModelError {
@@ -77,6 +79,7 @@ impl fmt::Display for StateModelError {
                 expected, actual
             ),
             Self::InvalidMerkleProof(msg) => write!(f, "Invalid Merkle proof: {}", msg),
+            Self::StorageError(msg) => write!(f, "Storage error: {}", msg),
         }
     }
 }

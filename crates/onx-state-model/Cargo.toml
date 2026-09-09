@@ -9,7 +9,9 @@ publish = false
 [dependencies]
 onx-primitives = { path = "../onx-primitives" }
 onx-data-structures = { path = "../onx-data-structures" }
+sled = "0.34.7"
 
 [dev-dependencies]
 hex = "0.4"
 proptest = "1.6"
+tempfile = "3.13"

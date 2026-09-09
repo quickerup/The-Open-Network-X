@@ -8,10 +8,12 @@ pub mod account;
 pub mod boc;
 pub mod cell;
 pub mod error;
+pub mod storage;
 pub mod tree;
 
 pub use account::{AccountState, AccountType, StorageStat};
 pub use boc::BagOfCells;
 pub use cell::{Cell, MAX_CELL_DATA_BYTES, MAX_CELL_REFS, ONX_CELL_HASH_V1_TAG};
 pub use error::StateModelError;
+pub use storage::{BlockCommitBatch, StorageEngine};
 pub use tree::{MerkleProof, ShardStateTree, MERKLE_PROOF_MAGIC};
