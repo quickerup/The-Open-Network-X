@@ -8,7 +8,7 @@ publish = false
 
 [dependencies]
 tokio = { version = "1.38", features = ["full"] }
-prometheus = "0.13"
+prometheus = "0.14"
 tracing = "0.1"
 tracing-opentelemetry = "0.31"
 opentelemetry = "0.30"

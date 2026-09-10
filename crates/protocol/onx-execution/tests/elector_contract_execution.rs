@@ -1,7 +1,7 @@
 use onx_consensus::{run_election, CandidateValidatorSpec, ElectionConfig};
-use onx_execution::{execute, ExecutionContext, ExecutionResult};
 use onx_data_structures::{AccountId, FullAddress, Message, MessageType, WorkchainIdent};
-use onx_primitives::{PublicKey, Uint128, Uint256, Uint64};
+use onx_execution::{execute, ExecutionContext, ExecutionResult};
+use onx_primitives::{SecretKey, Uint128, Uint256, Uint64};
 use onx_state_model::Cell;
 fn parse_hex_tvm(text: &str) -> Result<Vec<u8>, String> {
     let mut out = Vec::new();
@@ -26,8 +26,7 @@ fn parse_hex_tvm(text: &str) -> Result<Vec<u8>, String> {
 fn elector_contract_processes_stakes_and_emits_validator_set_cell() {
     let mut candidates = Vec::new();
     for i in 0..10 {
-        let bytes = [i as u8; 32];
-        let key = PublicKey::from_bytes(bytes).unwrap_or_else(|_| PublicKey::from_bytes([i as u8; 32]).unwrap());
+        let key = SecretKey::from_seed(&[i as u8; 32]).unwrap().public_key();
         candidates.push(CandidateValidatorSpec {
             public_key: key,
             proposed_stake: Uint64::from(1000u64 + i as u64),
@@ -50,11 +49,16 @@ fn elector_contract_processes_stakes_and_emits_validator_set_cell() {
         created_lt: Uint64::from(1u64),
         body_cell_hash: Uint256([0xFF; 32]),
     };
-    let exec = execute(code, data, message, ExecutionContext {
-        gen_utime: 0,
-        start_lt: 0,
-        end_lt: 1,
-        gas_limit: 1000,
-    });
+    let exec = execute(
+        code,
+        data,
+        message,
+        ExecutionContext {
+            gen_utime: 0,
+            start_lt: 0,
+            end_lt: 1,
+            gas_limit: 1000,
+        },
+    );
     assert!(matches!(exec, ExecutionResult::Success { .. }));
 }

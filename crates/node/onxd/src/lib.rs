@@ -2,18 +2,18 @@ use onx_consensus::{ConsensusEngine, RoundTimeouts, ValidatorSetEntry};
 use onx_data_structures::{ShardIdent, WorkchainIdent};
 use onx_execution::ExecutionContext;
 use onx_networking::{
-    AdnlTransportNode, DhtContact, DhtDaemon, DhtRpc, DhtRpcResponse, DhtTransport,
-    NetworkError, RldpConfig, RldpSender,
+    AdnlTransportNode, DhtContact, DhtDaemon, DhtRpc, DhtRpcResponse, DhtTransport, NetworkError,
+    RldpConfig, RldpSender,
 };
-use onx_primitives::{SecretKey, Uint64, Uint256};
+use onx_primitives::{SecretKey, Uint256, Uint64};
 use onx_state_model::StateStorage;
 use onx_telemetry::{serve_metrics, TelemetryConfig, TelemetryHandle};
+use std::fs;
 use std::future::Future;
 use std::net::SocketAddr;
 use std::path::Path;
 use std::pin::Pin;
 use std::sync::Arc;
-use std::fs;
 use std::time::{Duration, Instant};
 use tokio::time::{interval, sleep};
 
@@ -25,7 +25,7 @@ pub enum NodeRole {
 }
 
 impl NodeRole {
-    pub fn from_str(s: &str) -> Result<Self, String> {
+    pub fn parse(s: &str) -> Result<Self, String> {
         match s.to_ascii_lowercase().as_str() {
             "full" | "full-node" | "fullnode" => Ok(Self::FullNode),
             "validator" | "validator-node" | "validatornode" => Ok(Self::ValidatorNode),
@@ -59,8 +59,12 @@ impl Default for OnxdConfig {
 }
 
 pub fn load_config(path: impl AsRef<Path>) -> Result<OnxdConfig, String> {
-    let raw = fs::read_to_string(path.as_ref())
-        .map_err(|err| format!("failed to read config file {}: {err}", path.as_ref().display()))?;
+    let raw = fs::read_to_string(path.as_ref()).map_err(|err| {
+        format!(
+            "failed to read config file {}: {err}",
+            path.as_ref().display()
+        )
+    })?;
 
     let mut role = NodeRole::FullNode;
     let mut storage_path = "./onx-data".to_string();
@@ -78,15 +82,28 @@ pub fn load_config(path: impl AsRef<Path>) -> Result<OnxdConfig, String> {
             let key = key.trim();
             let value = value.trim().trim_matches('"');
             match key {
-                "role" => role = NodeRole::from_str(value)? ,
+                "role" => role = NodeRole::parse(value)?,
                 "storage_path" => storage_path = value.to_string(),
-                "network_enabled" => network_enabled = matches!(value.to_ascii_lowercase().as_str(), "1" | "true" | "yes" | "on"),
+                "network_enabled" => {
+                    network_enabled = matches!(
+                        value.to_ascii_lowercase().as_str(),
+                        "1" | "true" | "yes" | "on"
+                    )
+                }
                 "network_bind" => network_bind = value.to_string(),
                 "peers" => {
-                    peers = value.split(',').map(|p| p.trim().to_string()).filter(|p| !p.is_empty()).collect();
+                    peers = value
+                        .split(',')
+                        .map(|p| p.trim().to_string())
+                        .filter(|p| !p.is_empty())
+                        .collect();
                 }
                 "shutdown_after_ms" => {
-                    shutdown_after_ms = Some(value.parse::<u64>().map_err(|_| format!("invalid shutdown_after_ms value: {value}"))?);
+                    shutdown_after_ms = Some(
+                        value
+                            .parse::<u64>()
+                            .map_err(|_| format!("invalid shutdown_after_ms value: {value}"))?,
+                    );
                 }
                 _ => {}
             }
@@ -108,14 +125,11 @@ pub fn parse_cli_args(args: &[String]) -> Result<OnxdConfig, String> {
     let mut config_path = None;
 
     for idx in 1..args.len() {
-        match args[idx].as_str() {
-            "--config" => {
-                if idx + 1 >= args.len() {
-                    return Err("--config requires a path".to_string());
-                }
-                config_path = Some(args[idx + 1].clone());
+        if args[idx].as_str() == "--config" {
+            if idx + 1 >= args.len() {
+                return Err("--config requires a path".to_string());
             }
-            _ => {}
+            config_path = Some(args[idx + 1].clone());
         }
     }
 
@@ -131,7 +145,7 @@ pub fn parse_cli_args(args: &[String]) -> Result<OnxdConfig, String> {
                 if idx >= args.len() {
                     return Err("--role requires a value".to_string());
                 }
-                config.role = NodeRole::from_str(&args[idx])?;
+                config.role = NodeRole::parse(&args[idx])?;
             }
             "--storage-path" => {
                 idx += 1;
@@ -155,7 +169,9 @@ pub fn parse_cli_args(args: &[String]) -> Result<OnxdConfig, String> {
                 config.peers.push(args[idx].clone());
             }
             "--help" | "-h" => {
-                return Err("usage: onxd --config onxd.toml [--role full|validator|lite]".to_string());
+                return Err(
+                    "usage: onxd --config onxd.toml [--role full|validator|lite]".to_string(),
+                );
             }
             _ => {}
         }
@@ -178,8 +194,12 @@ impl DhtTransport for NullDhtTransport {
 }
 
 pub async fn run_daemon(config: OnxdConfig) -> Result<(), String> {
-    fs::create_dir_all(&config.storage_path)
-        .map_err(|err| format!("failed to initialize storage path {}: {err}", config.storage_path))?;
+    fs::create_dir_all(&config.storage_path).map_err(|err| {
+        format!(
+            "failed to initialize storage path {}: {err}",
+            config.storage_path
+        )
+    })?;
 
     let storage = StateStorage::open(&config.storage_path)
         .map_err(|err| format!("failed to initialize state storage: {err}"))?;
@@ -194,11 +214,9 @@ pub async fn run_daemon(config: OnxdConfig) -> Result<(), String> {
         let _ = serve_metrics(metrics_cfg).await;
     });
 
-    let runtime_shutdown = if let Some(ms) = config.shutdown_after_ms {
-        Some(sleep(Duration::from_millis(ms)))
-    } else {
-        None
-    };
+    let runtime_shutdown = config
+        .shutdown_after_ms
+        .map(|ms| sleep(Duration::from_millis(ms)));
 
     let mut network_loop = None;
     if config.network_enabled {
@@ -235,7 +253,7 @@ pub async fn run_daemon(config: OnxdConfig) -> Result<(), String> {
             public_key,
             actual_stake: Uint64::from(1),
         }];
-        let engine = ConsensusEngine::new(
+        let mut engine = ConsensusEngine::new(
             shard,
             0,
             validator_entries.clone(),
@@ -246,12 +264,8 @@ pub async fn run_daemon(config: OnxdConfig) -> Result<(), String> {
         let metrics = metrics.clone();
         let started_at = Instant::now();
 
-        let mut rldp = RldpSender::new(
-            Uint256([0u8; 32]),
-            &[0u8; 1],
-            RldpConfig::default(),
-        )
-        .map_err(|err| format!("failed to initialize RLDP sender: {err}"))?;
+        let mut rldp = RldpSender::new(Uint256([0u8; 32]), &[0u8; 1], RldpConfig::default())
+            .map_err(|err| format!("failed to initialize RLDP sender: {err}"))?;
 
         let handle = tokio::spawn(async move {
             let mut ticker = interval(Duration::from_millis(10));
@@ -341,11 +355,9 @@ mod tests {
         ]);
         assert!(cfg.is_err());
 
-        let parsed = parse_cli_args(&[
-            "onxd".to_string(),
-            "--role".to_string(),
-            "full".to_string(),
-        ]).unwrap();
+        let parsed =
+            parse_cli_args(&["onxd".to_string(), "--role".to_string(), "full".to_string()])
+                .unwrap();
         assert_eq!(parsed.role, NodeRole::FullNode);
     }
 }

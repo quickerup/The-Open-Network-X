@@ -5,6 +5,7 @@ allow = [
     "Apache-2.0 WITH LLVM-exception",
     "BSD-3-Clause",
     "BSD-1-Clause",
+    "CC0-1.0",
     "Unicode-3.0",
 ]
 confidence-threshold = 0.8

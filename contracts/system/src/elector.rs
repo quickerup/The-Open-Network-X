@@ -1,9 +1,10 @@
 use onx_consensus::{run_election, CandidateValidatorSpec, ElectionConfig};
-use onx_primitives::{PublicKey, Uint64};
-use std::collections::BTreeMap;
 
-pub fn run_elector_contract(candidates: Vec<CandidateValidatorSpec>) -> Result<Vec<ValidatorSetEntryStub>, String> {
-    let result = run_election(candidates, ElectionConfig::default()).map_err(|err| err.to_string())?;
+pub fn run_elector_contract(
+    candidates: Vec<CandidateValidatorSpec>,
+) -> Result<Vec<ValidatorSetEntryStub>, String> {
+    let result =
+        run_election(candidates, ElectionConfig::default()).map_err(|err| err.to_string())?;
     Ok(result
         .validators
         .into_iter()

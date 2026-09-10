@@ -76,16 +76,16 @@ impl RpcGateway {
 
     pub async fn serve(self) -> Result<(), String> {
         let bind = self.config.bind.clone();
-        let addr: SocketAddr = bind
-            .parse::<SocketAddr>()
-            .map_err(|err| err.to_string())?;
+        let addr: SocketAddr = bind.parse::<SocketAddr>().map_err(|err| err.to_string())?;
         let app = Router::new()
             .route("/rpc", post(rpc_json))
             .route("/lite", post(lite_binary))
             .route("/health", get(health))
             .layer(CorsLayer::permissive())
             .with_state(self);
-        let listener = TcpListener::bind(addr).await.map_err(|err| err.to_string())?;
+        let listener = TcpListener::bind(addr)
+            .await
+            .map_err(|err| err.to_string())?;
         let server = axum::serve(listener, app.into_make_service());
         server.await.map_err(|err| err.to_string())
     }
@@ -112,7 +112,15 @@ impl RpcGateway {
         if raw_boc.trim().is_empty() {
             return Err("empty raw_boc payload".to_string());
         }
-        if self.throttle.read().unwrap().get(raw_boc).copied().unwrap_or(0) >= self.config.max_rps {
+        if self
+            .throttle
+            .read()
+            .unwrap()
+            .get(raw_boc)
+            .copied()
+            .unwrap_or(0)
+            >= self.config.max_rps
+        {
             return Err("rate limit exceeded".to_string());
         }
         Ok(json!({
@@ -149,23 +157,33 @@ async fn rpc_json(
     State(state): State<RpcGateway>,
     Json(payload): Json<Value>,
 ) -> impl IntoResponse {
-    let method = payload.get("method").and_then(|v| v.as_str()).unwrap_or_default();
+    let method = payload
+        .get("method")
+        .and_then(|v| v.as_str())
+        .unwrap_or_default();
     let params = payload.get("params").cloned().unwrap_or(json!({}));
 
     let response = match method {
         "getAccountState" => {
-            let address = params.get("address").and_then(|v| v.as_str()).unwrap_or_default();
+            let address = params
+                .get("address")
+                .and_then(|v| v.as_str())
+                .unwrap_or_default();
             state.get_account_state(address)
         }
         "sendMessage" => {
-            let raw_boc = params.get("raw_boc").and_then(|v| v.as_str()).unwrap_or_default();
+            let raw_boc = params
+                .get("raw_boc")
+                .and_then(|v| v.as_str())
+                .unwrap_or_default();
             state.send_message(raw_boc)
         }
-        "getLatestBlock" => {
-            state.get_latest_block()
-        }
+        "getLatestBlock" => state.get_latest_block(),
         "estimateFee" => {
-            let raw_boc = params.get("raw_boc").and_then(|v| v.as_str()).unwrap_or_default();
+            let raw_boc = params
+                .get("raw_boc")
+                .and_then(|v| v.as_str())
+                .unwrap_or_default();
             state.estimate_fee(raw_boc)
         }
         _ => Ok(json!({ "error": "unknown_method" })),
@@ -173,7 +191,14 @@ async fn rpc_json(
 
     match response {
         Ok(result) => (StatusCode::OK, Json(RpcResponse { ok: true, result })).into_response(),
-        Err(err) => (StatusCode::BAD_REQUEST, Json(RpcResponse { ok: false, result: json!({"error": err}) })).into_response(),
+        Err(err) => (
+            StatusCode::BAD_REQUEST,
+            Json(RpcResponse {
+                ok: false,
+                result: json!({"error": err}),
+            }),
+        )
+            .into_response(),
     }
 }
 
@@ -182,7 +207,8 @@ async fn lite_binary(State(_state): State<RpcGateway>) -> impl IntoResponse {
         magic_bytes: 0x4D505246,
         target_key: [0u8; 32],
         root_hash: [0u8; 32],
-        proof_boc: BagOfCells::from_root(onx_state_model::Cell::new(vec![], vec![]).unwrap()).unwrap(),
+        proof_boc: BagOfCells::from_root(onx_state_model::Cell::new(vec![], vec![]).unwrap())
+            .unwrap(),
     };
     let bytes = proof.to_bytes();
     Response::builder()
@@ -205,7 +231,8 @@ mod tests {
 
     #[test]
     fn merkle_proof_binary_round_trip_is_verifiable() {
-        let proof_boc = BagOfCells::from_root(onx_state_model::Cell::new(vec![], vec![]).unwrap()).unwrap();
+        let proof_boc =
+            BagOfCells::from_root(onx_state_model::Cell::new(vec![], vec![]).unwrap()).unwrap();
         let root_hash = *proof_boc.root_hash();
         let proof = MerkleProof {
             magic_bytes: 0x4D505246,

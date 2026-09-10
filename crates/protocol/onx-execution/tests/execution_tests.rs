@@ -155,12 +155,7 @@ fn elector_contract_processes_ten_stakes_and_selects_winner_set() {
 
     let code = Cell::new(vec![0x00, 0x72], vec![]).unwrap();
     let data = Cell::new(vec![], vec![]).unwrap();
-    let exec = execute(
-        code,
-        data,
-        dummy_message(),
-        dummy_context(1000),
-    );
+    let exec = execute(code, data, dummy_message(), dummy_context(1000));
     assert!(matches!(exec, ExecutionResult::Success { .. }));
     assert_eq!(winners.len(), 10);
 }

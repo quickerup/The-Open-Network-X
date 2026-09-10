@@ -7,12 +7,12 @@ pub use adnl_transport::{
     PeerSession,
 };
 pub use dht_daemon::{DhtContact, DhtDaemon, DhtRpc, DhtRpcResponse, DhtTransport};
-pub use rldp::{RldpConfig, RldpSender};
 use onx_primitives::{
     domain_hash,
     hash::{DomainTag, VALIDATOR_SIGN_V1},
     PublicKey, Signature, Uint256, Uint64,
 };
+pub use rldp::{RldpConfig, RldpSender};
 use std::fmt;
 
 /// Errors in networking operations.
