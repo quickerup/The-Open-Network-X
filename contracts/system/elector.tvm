@@ -1,4 +1,5 @@
 ONX_ELECTOR_TVM_V1
 # Elector masterchain system contract bytecode stub
+00 72
 # Entry points: stake_deposit, compute_election, return_stake
 # Deterministic public contract assembly shape for validator stake deposits.

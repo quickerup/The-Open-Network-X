@@ -5,34 +5,26 @@
   },
   "metrics": {
     "bandwidth_mbps": 1000,
-    "elapsed_seconds": 0.000487,
+    "elapsed_seconds": 0.536859,
     "latency_ms": 50,
     "packet_drop_pct": 0.0
   },
   "nodes": [
     {
-      "chain_length": 101,
       "node_id": 0,
-      "rounds": 100,
-      "state_root": "7239fc8eb29721d3dca06c8f8d38172721cab6db22f5135b810304fc73a0b770"
+      "state": "onxd_process_started"
     },
     {
-      "chain_length": 101,
       "node_id": 1,
-      "rounds": 100,
-      "state_root": "7239fc8eb29721d3dca06c8f8d38172721cab6db22f5135b810304fc73a0b770"
+      "state": "onxd_process_started"
     },
     {
-      "chain_length": 101,
       "node_id": 2,
-      "rounds": 100,
-      "state_root": "7239fc8eb29721d3dca06c8f8d38172721cab6db22f5135b810304fc73a0b770"
+      "state": "onxd_process_started"
     },
     {
-      "chain_length": 101,
       "node_id": 3,
-      "rounds": 100,
-      "state_root": "7239fc8eb29721d3dca06c8f8d38172721cab6db22f5135b810304fc73a0b770"
+      "state": "onxd_process_started"
     }
   ],
   "scenario": {

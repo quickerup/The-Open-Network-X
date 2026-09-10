@@ -1,6 +1,9 @@
 use crate::{ChannelError, ChannelState, PaymentChannelArbiter};
 use onx_primitives::{Signature, Uint256, Uint64};
 use std::collections::HashMap;
+use std::sync::{Arc, atomic::{AtomicU64, Ordering}};
+use tokio::task::JoinHandle;
+use tokio::time::{interval, Duration};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SignedStateEnvelope {
@@ -16,9 +19,10 @@ impl SignedStateEnvelope {
 }
 
 /// A lightweight off-chain daemon that sits on top of the existing
-/// deterministic payment channel arbiter logic. It is intentionally
-/// service-scaffold shaped: the exchange API and dispute cycle are expressed
-/// in pure Rust types rather than trying to invent a real peer transport.
+/// deterministic payment channel arbiter logic. It is intentionally shaped
+/// like the current branch-safe service scaffold: the exchange API and dispute
+/// cycle remain in pure Rust, while the daemon can expose a background watcher
+/// that finalizes any challenge window recorded by the arbiter.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PaymentChannelDaemon {
     pub arbiter: PaymentChannelArbiter,
@@ -119,6 +123,26 @@ impl PaymentChannelDaemon {
             self.arbiter.finalize_uncooperative_settlement(current_lt)?;
         }
         Ok(())
+    }
+
+    /// Spawns a tiny background watcher that polls a monotonic logical-time
+    /// source and asks the arbiter to finalize any active challenge period
+    /// when the challenge window is exceeded. This keeps the runtime seam
+    /// deterministic without inventing a real peer transport.
+    pub fn spawn_background_challenge_watcher(
+        &self,
+        interval_ms: u64,
+        current_lt: Arc<AtomicU64>,
+    ) -> JoinHandle<()> {
+        let mut daemon = self.clone();
+        tokio::spawn(async move {
+            let mut ticker = interval(Duration::from_millis(interval_ms));
+            loop {
+                ticker.tick().await;
+                let observed_lt = Uint64(current_lt.load(Ordering::Relaxed));
+                let _ = daemon.finalize_dispute_if_due(observed_lt);
+            }
+        })
     }
 
     /// End-to-end service handoff used by the daemon test and examples.

@@ -1,3 +1,4 @@
 ONX_CONFIG_TVM_V1
 # Config masterchain system contract bytecode stub
+00 72
 # Governance config for gas rates, consensus timing, and validator set parameters.

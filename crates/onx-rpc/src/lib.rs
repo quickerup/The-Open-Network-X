@@ -1,7 +1,8 @@
 use axum::{
+    body::Body,
     extract::{Json, State},
-    http::StatusCode,
-    response::IntoResponse,
+    http::{header::CONTENT_TYPE, StatusCode},
+    response::{IntoResponse, Response},
     routing::{get, post},
     Router,
 };
@@ -184,7 +185,11 @@ async fn lite_binary(State(_state): State<RpcGateway>) -> impl IntoResponse {
         proof_boc: BagOfCells::from_root(onx_state_model::Cell::new(vec![], vec![]).unwrap()).unwrap(),
     };
     let bytes = proof.to_bytes();
-    (StatusCode::OK, bytes)
+    Response::builder()
+        .status(StatusCode::OK)
+        .header(CONTENT_TYPE, "application/octet-stream")
+        .body(Body::from(bytes))
+        .unwrap()
 }
 
 #[cfg(test)]
@@ -196,5 +201,21 @@ mod tests {
         let cfg = RpcConfig::default();
         let gateway = RpcGateway::new(cfg);
         assert!(gateway.get_latest_block().is_ok());
+    }
+
+    #[test]
+    fn merkle_proof_binary_round_trip_is_verifiable() {
+        let proof_boc = BagOfCells::from_root(onx_state_model::Cell::new(vec![], vec![]).unwrap()).unwrap();
+        let root_hash = *proof_boc.root_hash();
+        let proof = MerkleProof {
+            magic_bytes: 0x4D505246,
+            target_key: [0u8; 32],
+            root_hash,
+            proof_boc,
+        };
+        let bytes = proof.to_bytes();
+        let (decoded, consumed) = MerkleProof::from_bytes(&bytes).unwrap();
+        assert_eq!(consumed, bytes.len());
+        decoded.verify().unwrap();
     }
 }

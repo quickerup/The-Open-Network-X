@@ -12,6 +12,7 @@ onx-data-structures = { path = "../onx-data-structures" }
 onx-state-model = { path = "../onx-state-model" }
 onx-transactions = { path = "../onx-transactions" }
 onx-execution = { path = "../onx-execution" }
+tokio = { version = "1.38", features = ["rt", "time", "sync", "macros"] }
 
 [dev-dependencies]
 hex = "0.4"

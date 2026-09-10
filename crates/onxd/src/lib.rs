@@ -242,14 +242,13 @@ pub async fn run_daemon(config: OnxdConfig) -> Result<(), String> {
         let engine = ConsensusEngine::new(
             shard,
             0,
-            validator_entries,
+            validator_entries.clone(),
             0,
             RoundTimeouts::default(),
         )
         .map_err(|err| format!("failed to initialize consensus engine: {err}"))?;
-        let _ = engine;
 
-        let _rldp = RldpSender::new(
+        let mut rldp = RldpSender::new(
             Uint256([0u8; 32]),
             &[0u8; 1],
             RldpConfig::default(),
@@ -258,17 +257,17 @@ pub async fn run_daemon(config: OnxdConfig) -> Result<(), String> {
 
         let handle = tokio::spawn(async move {
             let mut ticker = interval(Duration::from_millis(10));
-            let _ = &adnl;
-            let _ = &dht;
-=======
-        let _ = (bind, role, peers);
-
-        let handle = tokio::spawn(async move {
-            let mut ticker = interval(Duration::from_millis(10));
->>>>>>> origin/main
+            let target = Uint256([0u8; 32]);
             loop {
                 ticker.tick().await;
-                let _ = "network-loop";
+                let _ = adnl.local_addr();
+                let _ = dht.contact();
+                let _ = dht.closest_contacts(target, 8);
+                let _ = engine.round();
+                let _ = engine.step();
+                let _ = engine.leader();
+                let _ = engine.finalized();
+                let _ = rldp.next_round();
             }
         });
         network_loop = Some(handle);

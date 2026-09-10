@@ -1,7 +1,7 @@
+use bip39::{Language, Mnemonic};
 use clap::{Parser, Subcommand};
 use onx_primitives::SecretKey;
 use serde::{Deserialize, Serialize};
-use sha2::{Digest, Sha256};
 use std::fs;
 use std::path::Path;
 
@@ -61,33 +61,28 @@ pub enum WalletCommand {
     Balance { address: String },
 }
 
-pub fn mnemonic_words() -> Vec<String> {
-    vec![
-        "abandon", "ability", "able", "about", "above", "absent", "absorb", "abstract",
-        "absurd", "abuse", "access", "accident",
-    ]
-    .into_iter()
-    .map(|s| s.to_string())
-    .collect()
+pub fn mnemonic_words() -> Result<Vec<String>, String> {
+    let mnemonic = Mnemonic::generate(12).map_err(|err| err.to_string())?;
+    Ok(mnemonic.words().map(|word| word.to_string()).collect())
 }
 
-pub fn generate_mnemonic() -> MnemonicEntry {
-    MnemonicEntry {
-        words: mnemonic_words(),
-    }
+pub fn generate_mnemonic() -> Result<MnemonicEntry, String> {
+    let words = mnemonic_words()?;
+    Ok(MnemonicEntry { words })
 }
 
 pub fn derive_ed25519_key_from_mnemonic(words: &[String]) -> Result<SecretKey, String> {
-    let mut hasher = Sha256::new();
-    hasher.update(words.join(" ").as_bytes());
-    let seed = hasher.finalize();
+    let phrase = words.join(" ");
+    let mnemonic = Mnemonic::parse_in_normalized(Language::English, &phrase)
+        .map_err(|err| err.to_string())?;
+    let seed = mnemonic.to_seed_normalized("");
     let mut key = [0u8; 32];
     key.copy_from_slice(&seed[..32]);
     SecretKey::from_seed(&key).map_err(|err| err.to_string())
 }
 
 pub fn wallet_create(out_dir: impl AsRef<Path>) -> Result<WalletCreateResponse, String> {
-    let mnemonic = generate_mnemonic();
+    let mnemonic = generate_mnemonic()?;
     let words = mnemonic.words.clone();
     let secret = derive_ed25519_key_from_mnemonic(&words)?;
     let public_key = secret.public_key();
@@ -99,7 +94,7 @@ pub fn wallet_create(out_dir: impl AsRef<Path>) -> Result<WalletCreateResponse, 
         out_dir.as_ref().join("wallet.json"),
         serde_json::to_string_pretty(&WalletCreateResponse {
             wallet: "wallet-000".to_string(),
-            mnemonic: mnemonic.words,
+            mnemonic: words.clone(),
             public_key_hex: pub_hex_for_file,
         })
         .map_err(|err| err.to_string())?,

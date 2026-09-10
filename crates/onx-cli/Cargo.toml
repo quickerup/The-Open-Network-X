@@ -19,6 +19,7 @@ rand = "0.8"
 sha2 = "0.9"
 thiserror = "1"
 tokio = { version = "1.38", features = ["full"] }
+bip39 = { version = "2", features = ["rand"] }
 onx-primitives = { path = "../onx-primitives" }
 onx-data-structures = { path = "../onx-data-structures" }
 onx-state-model = { path = "../onx-state-model" }
