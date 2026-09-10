@@ -31,8 +31,8 @@ open an issue so this document can be corrected.
 ## While implementing
 
 - **One crate per protocol layer**, under `crates/`, mirroring the
-  specification it implements (see `crates/onx-primitives` and
-  `crates/onx-data-structures` for the pattern). Depend on lower layers'
+  specification it implements (see `crates/protocol/onx-primitives` and
+  `crates/protocol/onx-data-structures` for the pattern). Depend on lower layers'
   crates rather than reimplementing their primitives.
 - **Implement the whole specified structure, not a convenient subset.** If
   a spec lists seven fields, implement seven fields. If you genuinely
@@ -61,11 +61,11 @@ open an issue so this document can be corrected.
 
 ## Research Question Logbook
 
-Every contributor is required to participate in the ONX Research Question Logbook (`docs/RESEARCH_LOGBOOK.md`).
+Every contributor is required to participate in the ONX Research Question Logbook (`docs/planning/research-logbook.md`).
 
 When submitting changes to the codebase, contributors must:
-1. Read the latest question in `docs/RESEARCH_LOGBOOK.md`.
-2. Add a new entry (`Entry #N`) to `docs/RESEARCH_LOGBOOK.md`.
+1. Read the latest question in `docs/planning/research-logbook.md`.
+2. Add a new entry (`Entry #N`) to `docs/planning/research-logbook.md`.
 3. Provide an answer to the previous question under a section containing the `[ANSWER]` label.
 4. Ask a new research/development question about ONX under a section containing the `[QUESTION]` label.
 

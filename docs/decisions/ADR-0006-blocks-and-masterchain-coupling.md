@@ -53,7 +53,7 @@ Rejected. The flags live inside `BlockHeader`, which `data-structures.md` (this 
 
 - `docs/specification/blocks.md` defines the formal rules.
 - No code changes in this ADR (specification only, per project convention of spec before implementation).
-- Future implementation work: a `crates/onx-blocks` (or similar) crate building on `crates/onx-data-structures`' `BlockHeader`, once ONX-ARCH-013 is resolved for the merge case.
+- Future implementation work: a `crates/protocol/onx-blocks` crate building on `crates/protocol/onx-data-structures`' `BlockHeader`, once ONX-ARCH-013 is resolved for the merge case.
 
 ## Tests
 

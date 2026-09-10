@@ -130,11 +130,11 @@ other fields.
 
 - Every block header, including the overwhelming majority that are never a
   merge result, carries an extra 32 bytes permanently.
-- `crates/onx-data-structures`' `BlockHeader` struct, its `to_bytes`/
+- `crates/protocol/onx-data-structures`' `BlockHeader` struct, its `to_bytes`/
   `from_bytes` methods, and its `BYTE_LENGTH` constant (currently 206 bytes,
   implementing the pre-amendment layout) need updating to the amended
   242-byte layout, and existing `BlockHeader` test vectors in
-  `crates/onx-data-structures/tests/data_structures_tests.rs` need updating
+  `crates/protocol/onx-data-structures/tests/data_structures_tests.rs` need updating
   alongside that change. Neither is done by this ADR, per this project's
   convention of specification and ADR before implementation (`ADR-0006`
   followed the same discipline).
@@ -158,7 +158,7 @@ other fields.
 - `docs/specification/architecture.md`'s ONX-ARCH-013 row updated to record
   resolution by this ADR.
 - No code changes in this ADR. Follow-up work (tracked in `ROADMAP.md`) must
-  update `crates/onx-data-structures`' `BlockHeader` implementation and tests
+  update `crates/protocol/onx-data-structures`' `BlockHeader` implementation and tests
   to the amended 242-byte layout before any block-validity-checking code can
   depend on it.
 

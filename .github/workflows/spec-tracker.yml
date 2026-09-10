@@ -66,14 +66,14 @@ jobs:
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
 
-      - name: Append entry to docs/research_log.md
+      - name: Append entry to docs/generated/spec-tracker-log.md
         run: |
-          mkdir -p docs
-          if [ ! -f "docs/research_log.md" ]; then
-            echo "# Spec Tracker Research Log" > docs/research_log.md
-            echo "" >> docs/research_log.md
-            echo "Automated log of commits tracked against WHITEPAPER.md." >> docs/research_log.md
-            echo "" >> docs/research_log.md
+          mkdir -p docs/generated
+          if [ ! -f "docs/generated/spec-tracker-log.md" ]; then
+            echo "# Spec Tracker Research Log" > docs/generated/spec-tracker-log.md
+            echo "" >> docs/generated/spec-tracker-log.md
+            echo "Automated log of commits tracked against WHITEPAPER.md." >> docs/generated/spec-tracker-log.md
+            echo "" >> docs/generated/spec-tracker-log.md
           fi
 
           {
@@ -88,14 +88,14 @@ jobs:
               echo "${{ steps.meta.outputs.modified_files }}" | sed 's/^/  - /'
             fi
             echo ""
-          } >> docs/research_log.md
+          } >> docs/generated/spec-tracker-log.md
 
       - name: Commit and push updated log
         if: github.event_name == 'push'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/research_log.md
+          git add docs/generated/spec-tracker-log.md
           if git diff --cached --quiet; then
             echo "No changes to commit."
           else
@@ -116,6 +116,6 @@ jobs:
             echo "${{ steps.meta.outputs.modified_files }}"
             echo '```'
             echo ""
-            echo "_Log entry will be committed to docs/research_log.md once merged to main._"
+            echo "_Log entry will be committed to docs/generated/spec-tracker-log.md once merged to main._"
           } >> "$GITHUB_STEP_SUMMARY"
           

@@ -27,7 +27,7 @@ ONX explores, reconstructs, and implements that vision independently and from fi
 - [Project philosophy](#project-philosophy)
 - [Project status](#project-status)
 - [Changelog and roadmap](ROADMAP.md)
-- [Development tasks](docs/development-tasks.md)
+- [Development tasks](docs/planning/development-tasks.md)
 - [Contributing](CONTRIBUTING.md)
 - [Repository structure](#repository-structure)
 - [Building and testing](#building-and-testing)
@@ -145,25 +145,33 @@ See [`ROADMAP.md`](ROADMAP.md) for the full changelog and roadmap of what has be
 
 ```
 .
-├── README.md
-├── INSTRUCTIONS.md          # Development principles for this repository
-├── WHITEPAPER.md            # Reference white paper (unmodified)
-├── Cargo.toml               # Rust workspace
+├── .github/                 # CI, dependency updates, and repository automation
+├── config/
+│   └── genesis.toml         # Default genesis configuration
+├── contracts/system/        # Masterchain contract adapters and TVM fixtures
 ├── crates/
-│   ├── onx-primitives/      # Canonical encoding, hashing, and signatures
-│   ├── onx-data-structures/ # ShardIdent, account/workchain IDs, messages, block headers
-│   ├── onx-state-model/     # Account states, Cell/BoC serialization, Merkle proofs
-│   ├── onx-transactions/    # Message admission, output-queue delivery, double-delivery prevention
-│   ├── onx-blocks/          # Block structural validity, masterchain coupling, split/merge flags
-│   ├── onx-execution/       # TVM execution engine, 46-opcode interpreter, gas metering
-│   ├── onx-payment-channels/# Payment channel arbiter, dispute resolution, off-chain state
-│   ├── onx-consensus/       # Validator election, 2/3 BFT quorum voting, finality evaluation
-│   ├── onx-networking/      # ADNL identity, RLDP datagram transport, DHT records, overlays
-│   ├── onx-sharding/        # Shard tree invariants, split/merge trigger logic, state migration
-│   └── onx-economics/       # Storage fee accrual, fee burn split, epoch inflation reward
-└── docs/
-    ├── specification/       # ONX protocol specifications
-    └── decisions/           # Architecture decision records (ADRs)
+│   ├── protocol/            # Consensus-critical protocol crates
+│   ├── node/                # Runtime, networking, RPC, and telemetry crates
+│   └── tooling/             # CLI and genesis-generation crates
+├── docs/
+│   ├── specification/       # ONX protocol specifications
+│   ├── decisions/           # Architecture decision records (ADRs)
+│   ├── planning/            # Research logbook and development tasks
+│   ├── guides/              # Operational and local-network guides
+│   ├── generated/           # CI-generated research and tracking logs
+│   └── reference/           # One-off reference and audit notes
+├── fuzz/                    # cargo-fuzz targets
+├── scripts/                 # Repository checks and maintenance tools
+├── tests/simulation/        # Deterministic network simulation
+├── Cargo.toml               # Rust workspace
+├── Cargo.lock               # Locked dependency versions
+├── INSTRUCTIONS.md          # Development principles for this repository
+├── CONTRIBUTING.md          # Contribution workflow
+├── LICENSE                  # Project license
+├── ROADMAP.md               # Changelog and high-level roadmap
+├── WHITEPAPER.md            # Reference white paper (unmodified)
+├── deny.toml                # cargo-deny configuration
+└── rust-toolchain.toml      # Rust toolchain pin
 ```
 
 ## Building and testing

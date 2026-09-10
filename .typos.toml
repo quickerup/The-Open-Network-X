@@ -1,7 +1,7 @@
 [files]
 extend-exclude = [
     "WHITEPAPER.md",
-    "docs/whitepaper-page-header-review.md",
+    "docs/reference/whitepaper-page-header-review.md",
 ]
 
 [default.extend-words]

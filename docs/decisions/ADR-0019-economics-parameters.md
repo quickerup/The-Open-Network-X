@@ -21,4 +21,4 @@ This ADR sets the economic parameters for ONX.
 
 - Resolves **ONX-ARCH-008**.
 - Updates `docs/specification/economics.md` and `architecture.md`.
-- Implements `crates/onx-economics`.
+- Implements `crates/protocol/onx-economics`.
