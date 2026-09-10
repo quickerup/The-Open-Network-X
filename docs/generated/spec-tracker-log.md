@@ -357,3 +357,57 @@ Automated log of commits tracked against WHITEPAPER.md.
   - tests/simulation/run_simulation.py
   - tests/simulation/simulation_report.json
 
+## Commit efa449f064cd5bd059395682bac604b5231ebe9c
+
+- **Timestamp:** 2026-09-10T08:13:58Z
+- **Event:** push
+- **Modified files:**
+  - crates/onxd/src/lib.rs
+  - tests/simulation/run_simulation.py
+
+## Commit c20f2d9604effdf03d89a6c5d9b61287018a36eb
+
+- **Timestamp:** 2026-09-10T08:28:47Z
+- **Event:** push
+- **Modified files:**
+  - .github/workflows/spec-tracker.yml
+  - .typos.toml
+  - CONTRIBUTING.md
+  - README.md
+  - WHITEPAPER.md
+  - docs/decisions/ADR-0001-preserve-multichain-architecture.md
+  - docs/decisions/ADR-0002-protocol-primitives-and-serialization.md
+  - docs/decisions/ADR-0003-state-model-and-account-lifecycle.md
+  - docs/decisions/ADR-0005-transactions-and-messaging.md
+  - docs/decisions/ADR-0006-blocks-and-masterchain-coupling.md
+  - docs/decisions/ADR-0007-execution-model-and-merkle-proof-reservation.md
+  - docs/decisions/ADR-0008-consensus-and-validator-operation.md
+  - docs/decisions/ADR-0009-networking-adnl-and-rldp.md
+  - docs/decisions/ADR-0010-networking-dht.md
+  - docs/decisions/ADR-0011-networking-overlay.md
+  - docs/decisions/ADR-0012-dynamic-sharding.md
+  - docs/decisions/ADR-0013-economics.md
+  - docs/decisions/ADR-0014-payment-channels.md
+  - docs/decisions/ADR-0016-merge-block-second-parent-reference.md
+  - docs/decisions/ADR-0017-tvm-instruction-set.md
+  - docs/research_log.md
+  - docs/specification/architecture.md
+  - docs/specification/blocks.md
+  - docs/specification/consensus.md
+  - docs/specification/data-structures.md
+  - docs/specification/economics.md
+  - docs/specification/execution.md
+  - docs/specification/networking-adnl.md
+  - docs/specification/networking-dht.md
+  - docs/specification/networking-overlay.md
+  - docs/specification/payment-channels.md
+  - docs/specification/protocol-primitives.md
+  - docs/specification/sharding.md
+  - docs/specification/state-model.md
+  - docs/specification/transactions.md
+  - docs/specification/tvm-instruction-set.md
+  - docs/whitepaper-page-header-review.md
+  - scripts/README.md
+  - scripts/check-spec-citations.py
+  - scripts/fix_whitepaper_page_headers.py
+
