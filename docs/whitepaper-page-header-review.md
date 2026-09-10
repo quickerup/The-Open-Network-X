@@ -1,6 +1,6 @@
 # Whitepaper page-header removal: manual review needed
 
-All 62 mid-sentence and mid-word page-header breaks catalogued in this review document have been manually inspected, resolved, and rejoined in `whitepaper.md`. No open cases remain.
+All 62 mid-sentence and mid-word page-header breaks catalogued in this review document have been manually inspected, resolved, and rejoined in `WHITEPAPER.md`. No open cases remain.
 
 **Correction (2026-09-10):** the claim above was inaccurate — one case, the
 page-20 break inside §2.3.6 ("Hashmap type"), was never actually rejoined.

@@ -8,7 +8,7 @@
 `docs/specification/blocks.md` §3.2 and `docs/specification/architecture.md`'s
 open question **ONX-ARCH-013**, both introduced by ADR-0006, identify that a
 merge block — the first block of a shardchain formed by merging two sibling
-shards (`whitepaper.md` §2.7.9) — has two parents, but
+shards (`WHITEPAPER.md` §2.7.9) — has two parents, but
 `docs/specification/data-structures.md` §4.4's `BlockHeader` has only one
 `prev_ref_hash` field. ADR-0006 deliberately left the wire representation
 undecided, flagging it as "a real design trade-off (fixed cost per block vs.
@@ -30,7 +30,7 @@ with.
 - `docs/decisions/ADR-0006-blocks-and-masterchain-coupling.md`: recorded the
   open question and, in its "Alternatives Considered" §B, the trade-off this
   ADR resolves.
-- `whitepaper.md` §2.7.9: a block belonging to the new merged shardchain,
+- `WHITEPAPER.md` §2.7.9: a block belonging to the new merged shardchain,
   "referring to both of its preceding blocks in its header."
 
 ## Problem
@@ -57,7 +57,7 @@ ADR-0006 explicitly declined to choose between these.
 2. **A new flag bit, `MERGE_RESULT` (bit 4, `0x0010`), is assigned within
    `BlockHeader.flags`**, the first of the "bits 4-15... reserved" range
    `blocks.md` §4.2 left open. It marks a block as the first block of a
-   shardchain formed by merging two sibling shards (`whitepaper.md` §2.7.9,
+   shardchain formed by merging two sibling shards (`WHITEPAPER.md` §2.7.9,
    `sharding.md` §3).
 3. **Field/flag consistency is a malformed-input rule:** `prev_ref_hash_2`
    MUST be all-zero (`0x00...00`) when `MERGE_RESULT` is clear, and MUST NOT
@@ -140,7 +140,7 @@ other fields.
   followed the same discipline).
 - `sharding.md`'s merge lifecycle rules (§3, ADR-0012) do not themselves
   restate exactly which block in the merge sequence sets `MERGE_RESULT`
-  beyond what `whitepaper.md` §2.7.9 already implies (the merged shard's
+  beyond what `WHITEPAPER.md` §2.7.9 already implies (the merged shard's
   first block); if Dynamic Sharding's own implementation surfaces a conflict
   with that reading, resolving it is that specification's own amendment
   process, not this ADR's.

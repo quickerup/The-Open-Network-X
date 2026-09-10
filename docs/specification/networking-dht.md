@@ -5,7 +5,7 @@
 
 ## 1. Reference
 
-- `whitepaper.md` §3.2.1–§3.2.5: 256-bit-keyed Kademlia-like DHT, node/service lookup, and tunnel entry points.
+- `WHITEPAPER.md` §3.2.1–§3.2.5: 256-bit-keyed Kademlia-like DHT, node/service lookup, and tunnel entry points.
 - `docs/specification/networking-adnl.md` §3.1: abstract-address/key-description format.
 
 ## 2. Requirement
@@ -14,7 +14,7 @@ ONX needs a distributed lookup service for nodes, services, and ADNL tunnel entr
 
 ## 3. ONX interpretation
 
-DHT keys are 256-bit hashes. Node records map an abstract ADNL address to contact information; service records map a 256-bit service key to advertised endpoints; tunnel records map an entry-point key to a reachable ADNL endpoint. Abstract address derivation is exclusively defined by `networking-adnl.md` §3.1 and is not duplicated here. Routing uses XOR distance over keys and iterative, Kademlia-like closest-peer lookup (`whitepaper.md` §3.2.1–§3.2.3). Records are signed by their advertised identity, have a protocol-specified expiry, and are only cacheable until expiry. A lookup result is advisory: it cannot establish block validity, validator membership, or canonicality.
+DHT keys are 256-bit hashes. Node records map an abstract ADNL address to contact information; service records map a 256-bit service key to advertised endpoints; tunnel records map an entry-point key to a reachable ADNL endpoint. Abstract address derivation is exclusively defined by `networking-adnl.md` §3.1 and is not duplicated here. Routing uses XOR distance over keys and iterative, Kademlia-like closest-peer lookup (`WHITEPAPER.md` §3.2.1–§3.2.3). Records are signed by their advertised identity, have a protocol-specified expiry, and are only cacheable until expiry. A lookup result is advisory: it cannot establish block validity, validator membership, or canonicality.
 
 ## 4. Serialization
 

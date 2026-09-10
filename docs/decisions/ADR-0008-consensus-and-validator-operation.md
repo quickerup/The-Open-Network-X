@@ -7,19 +7,19 @@
 
 `docs/specification/architecture.md`'s specification sequence (item 7) requires a Consensus and Validator Operation specification to define validator eligibility, election, task groups, block candidate propagation, BFT quorum thresholds, signature depth/decay, and finality rules. Open question **ONX-ARCH-005** specifically asks: *"What constitutes finality, and how are invalid-block claims and corrections processed?"*
 
-`whitepaper.md` §2.6 describes Proof-of-Stake consensus mechanisms, validator election formulas, task group rotation, late signature reward decay ($0.9^k$), signature depth ($d$), relative vs. recursive reliability, and vertical block correction. ONX needed to formalize these concepts into deterministic protocol rules and establish an explicit finality criterion.
+`WHITEPAPER.md` §2.6 describes Proof-of-Stake consensus mechanisms, validator election formulas, task group rotation, late signature reward decay ($0.9^k$), signature depth ($d$), relative vs. recursive reliability, and vertical block correction. ONX needed to formalize these concepts into deterministic protocol rules and establish an explicit finality criterion.
 
 ## Reference
 
-- `whitepaper.md`, §2.1.13–§2.1.17: Masterchain coupling and vertical block correction.
-- `whitepaper.md`, §2.6.1–§2.6.28: Proof-of-Stake consensus, validator elections, task group rotation, block propagation, signature depth, relative/recursive reliability, challenge windows.
+- `WHITEPAPER.md`, §2.1.13–§2.1.17: Masterchain coupling and vertical block correction.
+- `WHITEPAPER.md`, §2.6.1–§2.6.28: Proof-of-Stake consensus, validator elections, task group rotation, block propagation, signature depth, relative/recursive reliability, challenge windows.
 - `docs/specification/architecture.md`: Open question ONX-ARCH-005.
 - `docs/specification/blocks.md`: Structural block validity and canonical masterchain coupling.
 - `docs/specification/consensus.md`: The specification this ADR accepts.
 
 ## Problem
 
-`whitepaper.md` outlines consensus mechanisms using illustrative parameters and conceptual descriptions. Key open questions required explicit protocol decisions:
+`WHITEPAPER.md` outlines consensus mechanisms using illustrative parameters and conceptual descriptions. Key open questions required explicit protocol decisions:
 1. How is candidate stake capped to prevent stake concentration while incentivizing decentralization?
 2. What are the formal boundaries and economic incentives for non-validator roles (nominators, fishermen, collators)?
 3. How are per-shard validator task groups selected deterministically and rotated?

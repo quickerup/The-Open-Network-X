@@ -5,7 +5,7 @@
 
 ## Context
 
-`docs/specification/execution.md` (ADR-0007) deliberately defined the basic-workchain VM's execution contract — inputs, outputs, gas/exception shape, and required semantic categories — without enumerating concrete opcodes, because `whitepaper.md` §2.1.20 lists TVM's *features* rather than a bytecode table, and no such table exists anywhere in the reference material available to this project. `execution.md` §3.1 named this gap explicitly and required a separate, later, ADR-tracked "TVM Instruction Set" artifact before any ONX VM could be implemented in code. `docs/specification/architecture.md`'s **ONX-ARCH-006** row already anticipated this, listing "the concrete instruction set" as still open even after `execution.md`. This ADR accepts that artifact.
+`docs/specification/execution.md` (ADR-0007) deliberately defined the basic-workchain VM's execution contract — inputs, outputs, gas/exception shape, and required semantic categories — without enumerating concrete opcodes, because `WHITEPAPER.md` §2.1.20 lists TVM's *features* rather than a bytecode table, and no such table exists anywhere in the reference material available to this project. `execution.md` §3.1 named this gap explicitly and required a separate, later, ADR-tracked "TVM Instruction Set" artifact before any ONX VM could be implemented in code. `docs/specification/architecture.md`'s **ONX-ARCH-006** row already anticipated this, listing "the concrete instruction set" as still open even after `execution.md`. This ADR accepts that artifact.
 
 ## Reference
 
@@ -13,7 +13,7 @@
 - `docs/specification/state-model.md` §4.2: `Cell`'s `MAX_CELL_DATA_BYTES = 128`, `MAX_CELL_REFS = 4`, and `is_special` flag.
 - `docs/specification/protocol-primitives.md`: canonical fixed-width integers and domain-separated SHA-256/Ed25519 primitives reused rather than redefined.
 - `docs/specification/transactions.md`: `MAX_TENTATIVE_GAS = 10,000`, used as a cross-check on this document's gas pricing.
-- `whitepaper.md` §2.1.20, §5.1.9, §2.8.16–§2.8.17: TVM's feature list, the Merkle-proof-as-ordinary-value design intent, and the warning that foundational VM semantics are close to impossible to retrofit — the reason `execution.md` reserved pruned-branch semantics before this document existed, and the reason this document treats its own opcode set as extensible rather than closed.
+- `WHITEPAPER.md` §2.1.20, §5.1.9, §2.8.16–§2.8.17: TVM's feature list, the Merkle-proof-as-ordinary-value design intent, and the warning that foundational VM semantics are close to impossible to retrofit — the reason `execution.md` reserved pruned-branch semantics before this document existed, and the reason this document treats its own opcode set as extensible rather than closed.
 - `docs/specification/architecture.md`: **ONX-ARCH-006**, partially resolved further by this ADR.
 
 ## Problem
@@ -30,7 +30,7 @@ Without a concrete instruction set, no ONX VM implementation is possible: `execu
 3. **Extended opcode suite across seven byte ranges** (`docs/specification/tvm-instruction-set.md` §4): stack manipulation, arithmetic, conversion, bit/byte-strings, cell/value access, cryptographic primitives, and control flow — including `NIP`/`TUCK`/`BLKSWAP`, `DIV`/shifts, and structured conditional branches. The added stack operations cost 1 gas, `DIV` costs 8 gas, shifts cost 4 gas, and each added control-flow operation costs 4 gas.
 4. **All bytecode-well-formedness faults map to `MalformedCell`** (an unrecognized opcode, an out-of-range `ref_index`, or insufficient operand-stack depth), reasoning that a `code` `Cell` whose instruction stream cannot be decoded or dispatched is itself malformed under an extension of `state-model.md` §5's structural rules to a `code` `Cell`'s decode/dispatch-time validity — this document is itself the "ONX specification amendment" `execution.md` §3.4 requires before any exception-kind mapping decision like this is binding, and it deliberately does not add a sixth `ExceptionKind` to do so.
 5. **Division/modulo by zero also maps to `IntegerOverflow`**: no result exists that could fit any declared width, and no closed-set kind fits better.
-6. **The `AbsentNode`/pruned-branch boundary is drawn at content access, not reference-passing:** only `CTOS` raises it; `LDREF` and `HASHCELL` work on pruned cells without raising it, since a Merkle proof's shape and committed hash are exactly the information such a proof supplies (`whitepaper.md` §5.1.9).
+6. **The `AbsentNode`/pruned-branch boundary is drawn at content access, not reference-passing:** only `CTOS` raises it; `LDREF` and `HASHCELL` work on pruned cells without raising it, since a Merkle proof's shape and committed hash are exactly the information such a proof supplies (`WHITEPAPER.md` §5.1.9).
 7. **No call-stack depth limit beyond gas:** `CALLREF` costs gas per invocation, so the existing gas limit already bounds recursion depth without a second, independent limit.
 8. **Concrete gas prices** on a simple relative scale (`1` for cheap stack ops, `4`–`8` for arithmetic, `10` for cell access, `200` for hashing, `4000` for Ed25519 verification), explicitly labeled a first baseline rather than calibrated final pricing, cross-checked for plausibility against `transactions.md`'s existing `MAX_TENTATIVE_GAS = 10,000`.
 
@@ -48,9 +48,9 @@ Rejected. `execution.md` §3.3 requires "at least" 64/128/256-bit widths, not ex
 
 Rejected. `execution.md` §3.4's closed set exists specifically so a conforming implementation's exception surface is enumerable and testable (§6's "closed-set check" test item); every additional kind is a real cost to that property. `MalformedCell`'s existing definition ("a cell violates `state-model.md` §5's structural rules... when accessed as a typed value") already generalizes cleanly to "a code cell violates this document's decode-time structural rules when dispatched," so no new kind is needed — this document just makes that reading explicit, as `execution.md` §3.4 itself anticipated ("without an ONX specification amendment").
 
-### D. First-class continuations now, matching `whitepaper.md`'s TVM feature list
+### D. First-class continuations now, matching `WHITEPAPER.md`'s TVM feature list
 
-Rejected. `execution.md` §3.3's required-semantic-category list does not include closures, and `whitepaper.md` §2.8.16–§2.8.17's own warning about retrofit cost cuts both ways: committing to a specific continuation representation now, before any contract has exercised it, risks exactly the kind of premature foundational commitment that warning cautions against just as much as deferring does. A simple call-stack satisfies every `execution.md` requirement; continuations remain addable later as a new value kind without breaking this document's opcodes, since none of them expose the call stack as data.
+Rejected. `execution.md` §3.3's required-semantic-category list does not include closures, and `WHITEPAPER.md` §2.8.16–§2.8.17's own warning about retrofit cost cuts both ways: committing to a specific continuation representation now, before any contract has exercised it, risks exactly the kind of premature foundational commitment that warning cautions against just as much as deferring does. A simple call-stack satisfies every `execution.md` requirement; continuations remain addable later as a new value kind without breaking this document's opcodes, since none of them expose the call stack as data.
 
 ## Consequences
 

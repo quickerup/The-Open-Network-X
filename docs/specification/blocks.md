@@ -7,10 +7,10 @@
 
 ## 1. Reference
 
-- `whitepaper.md`, §2.1.13–§2.1.17: Masterchain/shardchain tight coupling, canonicality once referenced, and the vertical-block correction mechanism.
-- `whitepaper.md`, §2.6.1–§2.6.19: Validators, task groups, block-candidate propagation, BFT election of the next block, and masterchain block generation.
-- `whitepaper.md`, §2.6.20–§2.6.29: Signature "depth", relative vs. recursive block reliability, and the light-node consequence of Proof-of-Stake.
-- `whitepaper.md`, §2.7.1–§2.7.9: Shard configuration as masterchain state, split/merge announcement (§2.7.3), validator task-group inheritance, split/merge trigger conditions, and the split/merge header flags themselves.
+- `WHITEPAPER.md`, §2.1.13–§2.1.17: Masterchain/shardchain tight coupling, canonicality once referenced, and the vertical-block correction mechanism.
+- `WHITEPAPER.md`, §2.6.1–§2.6.19: Validators, task groups, block-candidate propagation, BFT election of the next block, and masterchain block generation.
+- `WHITEPAPER.md`, §2.6.20–§2.6.29: Signature "depth", relative vs. recursive block reliability, and the light-node consequence of Proof-of-Stake.
+- `WHITEPAPER.md`, §2.7.1–§2.7.9: Shard configuration as masterchain state, split/merge announcement (§2.7.3), validator task-group inheritance, split/merge trigger conditions, and the split/merge header flags themselves.
 - `INSTRUCTIONS.md`, §10, §14, §15: Consensus-critical determinism, dynamic-sharding invariants, and the masterchain/workchain/shardchain boundary.
 - `docs/specification/architecture.md`: Open questions ONX-ARCH-005 (finality/invalid-block correction) and ONX-ARCH-007 (split/merge thresholds and timing), both explicitly **not** resolved by this document.
 - `docs/specification/data-structures.md`, §4.4: The `BlockHeader` binary layout (242 bytes, amended by ADR-0016 to add `prev_ref_hash_2`), including its `flags: uint16` field and `prev_ref_hash`/`prev_ref_hash_2`/`master_ref_hash` fields, which this specification builds on rather than redefines.
@@ -48,7 +48,7 @@ Per §2.6.22, a validator's signature — and, at the specification level below 
 
 - An ordinary (non-split, non-merge) block has exactly one parent, referenced by `BlockHeader.prev_ref_hash`, per the existing `data-structures.md` layout. This covers the common case and the split case: each of the two new shardchains produced by a split has exactly one parent — the pre-split block (§2.7.7) — so a single `prev_ref_hash` field suffices for split children.
 - A **merge** block has two parents (§2.7.9: "referring to both of its preceding blocks in its header"). `data-structures.md` §4.4 amends `BlockHeader` with a second fixed field, `prev_ref_hash_2`, to represent this — **ONX-ARCH-013**, resolved by **ADR-0016**. A merge block sets bit 4 (`MERGE_RESULT`) of `flags` (§3.4, §4.2) and populates both `prev_ref_hash` and `prev_ref_hash_2` with its two parents' hashes; every other block leaves `MERGE_RESULT` clear and `prev_ref_hash_2` all-zero. A merge block's structural validity check (§3.1, rule 3) is "its two parents" — `prev_ref_hash` and `prev_ref_hash_2` — exactly as `data-structures.md` §4.4 now defines them.
-- `seq_no` continuity across split/merge is likewise not fully specified here: whether split children each start a fresh `seq_no` (e.g. 0) or continue their parent's sequence, and how a merge block's `seq_no` relates to its two parents' (whitepaper.md does not state this explicitly in §2.7), is left for the Dynamic Sharding specification (ONX-ARCH-007) to decide, since it is inseparable from the split/merge state-migration mechanics that specification owns. This specification requires only that whatever rule is chosen be a strictly-increasing, deterministic function of the parent(s)' `seq_no`.
+- `seq_no` continuity across split/merge is likewise not fully specified here: whether split children each start a fresh `seq_no` (e.g. 0) or continue their parent's sequence, and how a merge block's `seq_no` relates to its two parents' (WHITEPAPER.md does not state this explicitly in §2.7), is left for the Dynamic Sharding specification (ONX-ARCH-007) to decide, since it is inseparable from the split/merge state-migration mechanics that specification owns. This specification requires only that whatever rule is chosen be a strictly-increasing, deterministic function of the parent(s)' `seq_no`.
 
 ### 3.3 Masterchain coupling and canonicality
 
@@ -71,7 +71,7 @@ Per §2.7.3, §2.7.6, §2.7.7, §2.7.8, and §2.7.9, changes to the shard config
 ONX allocates these as four distinct bits within the existing `BlockHeader.flags: uint16` field (§4.2), rather than introducing a new header field, since `flags` already exists in `data-structures.md` §4.4 for exactly this kind of forward-compatible signaling and no other use of it had been specified at the time. A fifth bit, `MERGE_RESULT`, was subsequently assigned from the same reserved range by **ADR-0016**; unlike the four announcement flags above, `MERGE_RESULT` is not an advance announcement but a marker on the merge-result block itself, and its meaning and the `prev_ref_hash_2` field it gates are defined in `data-structures.md` §4.4, which owns that field — this document only records its bit position (§4.2) for the same reason it records the four announcement flags' positions.
 
 This specification defines **only the flag bit positions and their structural meaning** (a `SPLIT_COMMIT` block has no valid non-split successor per §2.7.7; a `MERGE_COMMIT` block has no valid separate-shard successor per §2.7.9). It explicitly does **not** define:
-- the load-based trigger conditions that cause a task group to set `SPLIT_PREPARE` or `MERGE_PREPARE` (§2.7.6, §2.7.8 give illustrative thresholds — e.g. "90% full for 64 consecutive blocks" — that `whitepaper.md` itself calls configurable; per `INSTRUCTIONS.md` §7, no illustrative number here becomes an ONX rule without its own decision);
+- the load-based trigger conditions that cause a task group to set `SPLIT_PREPARE` or `MERGE_PREPARE` (§2.7.6, §2.7.8 give illustrative thresholds — e.g. "90% full for 64 consecutive blocks" — that `WHITEPAPER.md` itself calls configurable; per `INSTRUCTIONS.md` §7, no illustrative number here becomes an ONX rule without its own decision);
 - the advance-announcement delay (§2.7.3 gives an illustrative 2⁶ blocks);
 - validator task-group inheritance and reassignment across a split/merge (§2.7.4–§2.7.5);
 - state splitting/merging itself.

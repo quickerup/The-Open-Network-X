@@ -5,14 +5,14 @@
 
 ## Context
 
-`docs/specification/architecture.md`'s specification sequence (item 6) requires an Execution specification, partially resolving ONX-ARCH-006 (VM rules per workchain). `whitepaper.md` §2.1.20 describes TVM's features at a high level but no concrete bytecode instruction set exists in the reference material. Separately, `whitepaper.md` §5.1.9 describes a specific VM primitive — treating an embedded Merkle proof as an ordinary, partially-pruned algebraic-type value, with an "absent node" exception on accessing an omitted subtree — that `whitepaper.md` §2.8.16 warns is much harder to add after a VM's semantics are fixed and contracts are deployed against it than to design in from the start. ONX needed to decide, now, whether to reserve this primitive.
+`docs/specification/architecture.md`'s specification sequence (item 6) requires an Execution specification, partially resolving ONX-ARCH-006 (VM rules per workchain). `WHITEPAPER.md` §2.1.20 describes TVM's features at a high level but no concrete bytecode instruction set exists in the reference material. Separately, `WHITEPAPER.md` §5.1.9 describes a specific VM primitive — treating an embedded Merkle proof as an ordinary, partially-pruned algebraic-type value, with an "absent node" exception on accessing an omitted subtree — that `WHITEPAPER.md` §2.8.16 warns is much harder to add after a VM's semantics are fixed and contracts are deployed against it than to design in from the start. ONX needed to decide, now, whether to reserve this primitive.
 
 ## Reference
 
-- `whitepaper.md`, §2.1.20: TVM feature list.
-- `whitepaper.md`, §2.2.6: `ev_trans`/`ev_block` transaction- and block-evaluation functions.
-- `whitepaper.md`, §5.1.9: Merkle-proof-as-pruned-cell-value VM primitive.
-- `whitepaper.md`, §2.8.16–§2.8.17: Difficulty of retrofitting a blockchain project's "genome" post-deployment.
+- `WHITEPAPER.md`, §2.1.20: TVM feature list.
+- `WHITEPAPER.md`, §2.2.6: `ev_trans`/`ev_block` transaction- and block-evaluation functions.
+- `WHITEPAPER.md`, §5.1.9: Merkle-proof-as-pruned-cell-value VM primitive.
+- `WHITEPAPER.md`, §2.8.16–§2.8.17: Difficulty of retrofitting a blockchain project's "genome" post-deployment.
 - `INSTRUCTIONS.md`, §16, §17: VM as protocol component; VM defines contract execution, not the host language.
 - `docs/specification/architecture.md`: Open questions ONX-ARCH-006 (partially resolved here) and ONX-ARCH-009 (payment channels; depends on the decision below).
 - `docs/specification/state-model.md`, §4.2: The existing `Cell.is_special_flag` bit, reserved but previously undefined.
@@ -34,13 +34,13 @@ Three related decisions needed to be made and recorded, not left implicit:
 ## Alternatives Considered
 
 ### A. Defer the Merkle-proof primitive decision until the Payment Channels specification is written
-Rejected. This is exactly the retrofit risk `whitepaper.md` §2.8.16 warns about: if the future "TVM Instruction Set" artifact is designed and implemented against a VM where every cell reference is assumed always fully present, adding pruned-branch awareness afterward would mean revisiting every already-defined cell-access operation, not just adding a new one. Reserving the *requirement* now costs nothing (no instruction set exists yet to retrofit), while deferring costs a rework later that ONX-ARCH-009 doesn't need to force by itself.
+Rejected. This is exactly the retrofit risk `WHITEPAPER.md` §2.8.16 warns about: if the future "TVM Instruction Set" artifact is designed and implemented against a VM where every cell reference is assumed always fully present, adding pruned-branch awareness afterward would mean revisiting every already-defined cell-access operation, not just adding a new one. Reserving the *requirement* now costs nothing (no instruction set exists yet to retrofit), while deferring costs a rework later that ONX-ARCH-009 doesn't need to force by itself.
 
 ### B. Reject the Merkle-proof primitive; treat payment channels as needing bespoke consensus support instead
-Rejected. `whitepaper.md` §5.1.9's own point is that this VM primitive is what makes payment-channel (and general light-client) verification implementable as an *ordinary* smart contract rather than requiring special-cased consensus logic. Rejecting it would mean ONX-ARCH-009 needs its own consensus-level mechanism instead — a larger, harder-to-reverse commitment than reserving one VM exception kind and one cell-flag meaning.
+Rejected. `WHITEPAPER.md` §5.1.9's own point is that this VM primitive is what makes payment-channel (and general light-client) verification implementable as an *ordinary* smart contract rather than requiring special-cased consensus logic. Rejecting it would mean ONX-ARCH-009 needs its own consensus-level mechanism instead — a larger, harder-to-reverse commitment than reserving one VM exception kind and one cell-flag meaning.
 
 ### C. Write a full concrete bytecode instruction set and gas price table now
-Rejected. Neither `whitepaper.md` nor any ONX document provides an opcode-level TVM instruction set to draw from; inventing one now would be exactly the kind of unfounded assumption `INSTRUCTIONS.md` §21 warns AI agents against ("must not invent protocol behavior without documenting it"). `execution.md` instead specifies the *properties* a future instruction set must satisfy (determinism, overflow-checking, the exception set), which is verifiable and falsifiable once such a set exists, without fabricating opcodes the project hasn't actually decided on.
+Rejected. Neither `WHITEPAPER.md` nor any ONX document provides an opcode-level TVM instruction set to draw from; inventing one now would be exactly the kind of unfounded assumption `INSTRUCTIONS.md` §21 warns AI agents against ("must not invent protocol behavior without documenting it"). `execution.md` instead specifies the *properties* a future instruction set must satisfy (determinism, overflow-checking, the exception set), which is verifiable and falsifiable once such a set exists, without fabricating opcodes the project hasn't actually decided on.
 
 ## Consequences
 

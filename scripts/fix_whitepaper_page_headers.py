@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Find and (optionally) remove injected PDF page headers/footers in whitepaper.md.
+"""Find and (optionally) remove injected PDF page headers/footers in WHITEPAPER.md.
 
 During the PDF-to-Markdown conversion, every page break left behind a
 three-line "running header" block interleaved into the flowing text:
@@ -118,7 +118,7 @@ def classify(prev_line, next_line):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--file", default="whitepaper.md")
+    ap.add_argument("--file", default="WHITEPAPER.md")
     ap.add_argument("--apply", action="store_true", help="Remove paragraph-boundary blocks in place")
     ap.add_argument("--report", default=None, help="Write the manual-review list to this path (Markdown)")
     args = ap.parse_args()

@@ -15,7 +15,7 @@ open an issue so this document can be corrected.
    `docs/specification/architecture.md`. Check `ROADMAP.md` for what's
    already specified and what's next.
 2. **If the spec doesn't exist yet, write it first**, as its own PR:
-   - State the reference sections (`whitepaper.md`, `INSTRUCTIONS.md`) it draws from.
+   - State the reference sections (`WHITEPAPER.md`, `INSTRUCTIONS.md`) it draws from.
    - Separate what's explicitly required from what you're interpreting.
    - Record ambiguities and the interpretation chosen, with a permanent ID
      (`ONX-ARCH-NNN` or similar) if the architecture baseline already
@@ -78,7 +78,7 @@ highest existing one) when a PR:
 
 - Chooses one of several defensible interpretations of an ambiguous spec
   section.
-- Makes a deviation from the reference (`whitepaper.md`) or from a previously
+- Makes a deviation from the reference (`WHITEPAPER.md`) or from a previously
   accepted ADR.
 - Picks a dependency, algorithm, or tool that a future contributor might
   reasonably question ("why this crate and not that one").

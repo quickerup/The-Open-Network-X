@@ -5,11 +5,11 @@
 
 ## Context
 
-The historical reference (`whitepaper.md` §2.4) outlines an asynchronous message-passing protocol based on the Actor model for cross-shard communication. Messages can be internal (between smart contracts/accounts) or external ("from nowhere," originating off-chain). Inter-shard messaging uses hypercube routing along neighboring shard boundaries, supported by output message queues and double-delivery prevention tracking. To ensure deterministic execution, bounded consensus complexity, and replay protection across all ONX workchains and shardchains, ONX must formalize its messaging admission rules, value representation model, inter-shard delivery routing, and delivery ordering invariants.
+The historical reference (`WHITEPAPER.md` §2.4) outlines an asynchronous message-passing protocol based on the Actor model for cross-shard communication. Messages can be internal (between smart contracts/accounts) or external ("from nowhere," originating off-chain). Inter-shard messaging uses hypercube routing along neighboring shard boundaries, supported by output message queues and double-delivery prevention tracking. To ensure deterministic execution, bounded consensus complexity, and replay protection across all ONX workchains and shardchains, ONX must formalize its messaging admission rules, value representation model, inter-shard delivery routing, and delivery ordering invariants.
 
 ## Reference
 
-- `whitepaper.md`, §2.4.1–§2.4.27: Messages between shardchains, message value model, external inbound/outbound messages, output queues, hypercube routing, fast path delivery, and double-delivery prevention.
+- `WHITEPAPER.md`, §2.4.1–§2.4.27: Messages between shardchains, message value model, external inbound/outbound messages, output queues, hypercube routing, fast path delivery, and double-delivery prevention.
   - §2.4.5: Value model as `(currency_id, value)` pairs.
   - §2.4.6: External messages and tentative execution rules under small gas limits.
   - §2.4.16–§2.4.17: Output-queue-only architecture and per-account FIFO delivery ordering.

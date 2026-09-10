@@ -7,10 +7,10 @@
 
 ## 1. Reference
 
-- `whitepaper.md`, §2.1.6, §2.1.8, §2.1.9: Identification of workchains, shardchains, and account-chains.
-- `whitepaper.md`, §2.2.5: TL-B and algebraic type specifications.
-- `whitepaper.md`, §2.3.1: Account IDs as 256-bit values.
-- `whitepaper.md`, §2.5.15, §2.6.15: Block headers, masterchain coupling, and state commitments.
+- `WHITEPAPER.md`, §2.1.6, §2.1.8, §2.1.9: Identification of workchains, shardchains, and account-chains.
+- `WHITEPAPER.md`, §2.2.5: TL-B and algebraic type specifications.
+- `WHITEPAPER.md`, §2.3.1: Account IDs as 256-bit values.
+- `WHITEPAPER.md`, §2.5.15, §2.6.15: Block headers, masterchain coupling, and state commitments.
 - `INSTRUCTIONS.md`, §12, §14, §15, §21, §23: Serialization, dynamic sharding invariants, masterchain/workchain/shardchain boundaries, and protocol testability.
 - `docs/specification/architecture.md`: Architectural baseline requirements and open questions ONX-ARCH-002 and ONX-ARCH-003.
 - `docs/specification/blocks.md` §3.2, §4.2: Merge-block second parent reference and split/merge header flags, which `BlockHeader`'s `prev_ref_hash_2` field and `MERGE_RESULT` flag (§4.4 below) exist to support.
@@ -99,7 +99,7 @@ Fixed binary header layout (242 bytes total; amended by **ADR-0016**, resolving 
 15. out_msg_root_hash: uint256 (32 bytes, output message Merkle tree root)
 ```
 
-**`prev_ref_hash_2` and `MERGE_RESULT` (added by ADR-0016):** A merge block — the first block of a shardchain formed by merging two sibling shards (`whitepaper.md` §2.7.9, `docs/specification/sharding.md` §3) — has two parents, which the pre-amendment layout's single `prev_ref_hash` field could not represent (`blocks.md` §3.2, **ONX-ARCH-013**). ADR-0016 resolves this with a fixed second field rather than a variable-length trailer, so `BlockHeader` remains a single fixed-length structure for every block:
+**`prev_ref_hash_2` and `MERGE_RESULT` (added by ADR-0016):** A merge block — the first block of a shardchain formed by merging two sibling shards (`WHITEPAPER.md` §2.7.9, `docs/specification/sharding.md` §3) — has two parents, which the pre-amendment layout's single `prev_ref_hash` field could not represent (`blocks.md` §3.2, **ONX-ARCH-013**). ADR-0016 resolves this with a fixed second field rather than a variable-length trailer, so `BlockHeader` remains a single fixed-length structure for every block:
 - Bit 4 (`0x0010`) of `flags` is `MERGE_RESULT`, assigned from the "bits 4-15... reserved" range `blocks.md` §4.2 left open for exactly this kind of future use. It marks a block as a merge block.
 - `prev_ref_hash_2` MUST be all-zero (`0x00...00`) when `MERGE_RESULT` is clear. When `MERGE_RESULT` is set, `prev_ref_hash` and `prev_ref_hash_2` are the block's two parents (order does not carry meaning: both must resolve to sibling shard blocks per `blocks.md` §3.2), and `prev_ref_hash_2` MUST NOT be all-zero.
 - This reuses the same "all-zero means not applicable" convention `master_ref_hash` already uses to distinguish masterchain from shardchain blocks, rather than a new encoding idiom.

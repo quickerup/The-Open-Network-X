@@ -7,9 +7,9 @@
 
 ## 1. Reference
 
-- `whitepaper.md`, §2.2.8–§2.2.10: Block hashes and sha256 assumptions.
-- `whitepaper.md`, §2.3.1: 256-bit ECC public keys and account identifiers.
-- `whitepaper.md`, §11 (in `INSTRUCTIONS.md`): Cryptographic primitives requirements, domain separation, and deterministic serialization.
+- `WHITEPAPER.md`, §2.2.8–§2.2.10: Block hashes and sha256 assumptions.
+- `WHITEPAPER.md`, §2.3.1: 256-bit ECC public keys and account identifiers.
+- `WHITEPAPER.md`, §11 (in `INSTRUCTIONS.md`): Cryptographic primitives requirements, domain separation, and deterministic serialization.
 - `docs/specification/architecture.md`: Open question ONX-ARCH-001 regarding canonical serialization and cryptographic primitives.
 
 ---
