@@ -42,6 +42,7 @@ pub struct OnxdConfig {
     pub network_enabled: bool,
     pub network_bind: String,
     pub peers: Vec<String>,
+    pub bootstrap_genesis: Option<String>,
     pub shutdown_after_ms: Option<u64>,
 }
 
@@ -53,6 +54,7 @@ impl Default for OnxdConfig {
             network_enabled: true,
             network_bind: "127.0.0.1:0".to_string(),
             peers: Vec::new(),
+            bootstrap_genesis: None,
             shutdown_after_ms: None,
         }
     }
@@ -71,6 +73,7 @@ pub fn load_config(path: impl AsRef<Path>) -> Result<OnxdConfig, String> {
     let mut network_enabled = true;
     let mut network_bind = "127.0.0.1:0".to_string();
     let mut peers = Vec::new();
+    let mut bootstrap_genesis = None;
     let mut shutdown_after_ms = None;
 
     for line in raw.lines() {
@@ -98,6 +101,7 @@ pub fn load_config(path: impl AsRef<Path>) -> Result<OnxdConfig, String> {
                         .filter(|p| !p.is_empty())
                         .collect();
                 }
+                "bootstrap_genesis" => bootstrap_genesis = Some(value.to_string()),
                 "shutdown_after_ms" => {
                     shutdown_after_ms = Some(
                         value
@@ -116,6 +120,7 @@ pub fn load_config(path: impl AsRef<Path>) -> Result<OnxdConfig, String> {
         network_enabled,
         network_bind,
         peers,
+        bootstrap_genesis,
         shutdown_after_ms,
     })
 }
@@ -204,6 +209,14 @@ pub async fn run_daemon(config: OnxdConfig) -> Result<(), String> {
     let storage = StateStorage::open(&config.storage_path)
         .map_err(|err| format!("failed to initialize state storage: {err}"))?;
     let _storage = storage;
+
+    if let Some(genesis_path) = &config.bootstrap_genesis {
+        let genesis = fs::read(genesis_path)
+            .map_err(|err| format!("failed to read bootstrap genesis {}: {err}", genesis_path))?;
+        if genesis.is_empty() {
+            return Err(format!("bootstrap genesis is empty: {genesis_path}"));
+        }
+    }
 
     let metrics = TelemetryHandle::new().map_err(|err| err.to_string())?;
     metrics.set_connected_peers(config.peers.len() as i64);
@@ -335,12 +348,13 @@ mod tests {
     #[test]
     fn config_parsing_and_role_mapping_round_trip() {
         let tmp = std::env::temp_dir().join(format!("onxd-config-{}.toml", std::process::id()));
-        fs::write(&tmp, "role = \"validator\"\nstorage_path = \"./state\"\nnetwork_enabled = true\nnetwork_bind = \"127.0.0.1:9001\"\npeers = \"p1,p2\"\n").unwrap();
+        fs::write(&tmp, "role = \"validator\"\nstorage_path = \"./state\"\nnetwork_enabled = true\nnetwork_bind = \"127.0.0.1:9001\"\npeers = \"p1,p2\"\nbootstrap_genesis = \"genesis.boc\"\n").unwrap();
         let config = load_config(&tmp).unwrap();
         assert_eq!(config.role, NodeRole::ValidatorNode);
         assert_eq!(config.storage_path, "./state");
         assert_eq!(config.network_bind, "127.0.0.1:9001");
         assert_eq!(config.peers, vec!["p1", "p2"]);
+        assert_eq!(config.bootstrap_genesis.as_deref(), Some("genesis.boc"));
         let _ = fs::remove_file(tmp);
     }
 

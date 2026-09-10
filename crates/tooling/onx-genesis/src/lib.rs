@@ -151,10 +151,10 @@ pub fn generate_genesis(config: &GenesisConfig, output_dir: PathBuf) -> Result<(
 
     for idx in 0..4 {
         let node_cfg = format!(
-            "role = \"validator\"\nstorage_path = \"target/onxd-node-{}\"\nnetwork_enabled = true\nnetwork_bind = \"127.0.0.1:{}000\"\npeers = \"127.0.0.1:{}001\"\nbootstrap_genesis = \"{}\"\n",
+            "role = \"validator\"\nstorage_path = \"target/onxd-node-{}\"\nnetwork_enabled = true\nnetwork_bind = \"127.0.0.1:{}\"\npeers = \"127.0.0.1:{}\"\nbootstrap_genesis = \"{}\"\n",
             idx,
-            idx + 1,
-            idx + 1,
+            10_000 + idx * 1_000,
+            10_001 + idx * 1_000,
             genesis_boc_path.display()
         );
         fs::write(output_dir.join(format!("node-{}.toml", idx)), node_cfg)

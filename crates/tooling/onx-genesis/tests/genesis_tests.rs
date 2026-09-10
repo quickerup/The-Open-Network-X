@@ -45,6 +45,10 @@ fn emits_canonical_genesis_and_bootstrap_files() {
     assert!(temp.join("node-2.toml").exists());
     assert!(temp.join("node-3.toml").exists());
 
+    let node_zero = fs::read_to_string(temp.join("node-0.toml")).unwrap();
+    assert!(node_zero.contains("network_bind = \"127.0.0.1:10000\""));
+    assert!(node_zero.contains("peers = \"127.0.0.1:10001\""));
+
     let generated = fs::read_to_string(temp.join("genesis.boc")).unwrap();
     assert!(generated.contains("masterchain_genesis#0"));
     assert!(generated.contains("initial_balances="));
