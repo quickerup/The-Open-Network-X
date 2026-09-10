@@ -1,7 +1,10 @@
 use crate::{ChannelError, ChannelState, PaymentChannelArbiter};
 use onx_primitives::{Signature, Uint256, Uint64};
 use std::collections::HashMap;
-use std::sync::{Arc, atomic::{AtomicU64, Ordering}};
+use std::sync::{
+    atomic::{AtomicU64, Ordering},
+    Arc,
+};
 use tokio::task::JoinHandle;
 use tokio::time::{interval, Duration};
 
@@ -14,7 +17,11 @@ pub struct SignedStateEnvelope {
 
 impl SignedStateEnvelope {
     pub fn new(state: ChannelState, sig_a: Signature, sig_b: Signature) -> Self {
-        Self { state, sig_a, sig_b }
+        Self {
+            state,
+            sig_a,
+            sig_b,
+        }
     }
 }
 
@@ -46,14 +53,22 @@ impl PaymentChannelDaemon {
             .unwrap_or_else(|| self.arbiter.latest_state.clone())
     }
 
-    pub fn exchange_signed_state(&mut self, envelope: SignedStateEnvelope) -> Result<(), ChannelError> {
-        let SignedStateEnvelope { state, sig_a, sig_b } = envelope;
+    pub fn exchange_signed_state(
+        &mut self,
+        envelope: SignedStateEnvelope,
+    ) -> Result<(), ChannelError> {
+        let SignedStateEnvelope {
+            state,
+            sig_a,
+            sig_b,
+        } = envelope;
 
         if state.channel_id != self.arbiter.channel_id {
             return Err(ChannelError::MismatchedChannelId);
         }
 
-        self.arbiter.verify_dual_signatures(&state, &sig_a, &sig_b)?;
+        self.arbiter
+            .verify_dual_signatures(&state, &sig_a, &sig_b)?;
 
         if state.sequence.0 <= self.latest_state().sequence.0 {
             return Err(ChannelError::NonIncreasingSequence);
@@ -69,7 +84,8 @@ impl PaymentChannelDaemon {
         }
 
         self.arbiter.latest_state = state.clone();
-        self.latest_by_channel.insert(self.arbiter.channel_id, state.clone());
+        self.latest_by_channel
+            .insert(self.arbiter.channel_id, state.clone());
         Ok(())
     }
 
@@ -77,9 +93,14 @@ impl PaymentChannelDaemon {
         &mut self,
         envelope: SignedStateEnvelope,
     ) -> Result<(), ChannelError> {
-        let SignedStateEnvelope { state, sig_a, sig_b } = envelope;
+        let SignedStateEnvelope {
+            state,
+            sig_a,
+            sig_b,
+        } = envelope;
         self.arbiter.cooperative_settle(state, sig_a, sig_b)?;
-        self.latest_by_channel.insert(self.arbiter.channel_id, self.arbiter.latest_state.clone());
+        self.latest_by_channel
+            .insert(self.arbiter.channel_id, self.arbiter.latest_state.clone());
         Ok(())
     }
 
@@ -111,9 +132,15 @@ impl PaymentChannelDaemon {
         envelope: SignedStateEnvelope,
         current_lt: Uint64,
     ) -> Result<(), ChannelError> {
-        let SignedStateEnvelope { state, sig_a, sig_b } = envelope;
-        self.arbiter.submit_uncooperative_state(state, sig_a, sig_b, current_lt)?;
-        self.latest_by_channel.insert(self.arbiter.channel_id, self.arbiter.latest_state.clone());
+        let SignedStateEnvelope {
+            state,
+            sig_a,
+            sig_b,
+        } = envelope;
+        self.arbiter
+            .submit_uncooperative_state(state, sig_a, sig_b, current_lt)?;
+        self.latest_by_channel
+            .insert(self.arbiter.channel_id, self.arbiter.latest_state.clone());
         Ok(())
     }
 

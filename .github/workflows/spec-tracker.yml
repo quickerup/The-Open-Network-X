@@ -70,10 +70,12 @@ jobs:
         run: |
           mkdir -p docs/generated
           if [ ! -f "docs/generated/spec-tracker-log.md" ]; then
-            echo "# Spec Tracker Research Log" > docs/generated/spec-tracker-log.md
-            echo "" >> docs/generated/spec-tracker-log.md
-            echo "Automated log of commits tracked against WHITEPAPER.md." >> docs/generated/spec-tracker-log.md
-            echo "" >> docs/generated/spec-tracker-log.md
+            {
+              echo "# Spec Tracker Research Log"
+              echo ""
+              echo "Automated log of commits tracked against WHITEPAPER.md."
+              echo ""
+            } > docs/generated/spec-tracker-log.md
           fi
 
           {

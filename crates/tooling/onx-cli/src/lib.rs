@@ -73,8 +73,8 @@ pub fn generate_mnemonic() -> Result<MnemonicEntry, String> {
 
 pub fn derive_ed25519_key_from_mnemonic(words: &[String]) -> Result<SecretKey, String> {
     let phrase = words.join(" ");
-    let mnemonic = Mnemonic::parse_in_normalized(Language::English, &phrase)
-        .map_err(|err| err.to_string())?;
+    let mnemonic =
+        Mnemonic::parse_in_normalized(Language::English, &phrase).map_err(|err| err.to_string())?;
     let seed = mnemonic.to_seed_normalized("");
     let mut key = [0u8; 32];
     key.copy_from_slice(&seed[..32]);

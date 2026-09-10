@@ -54,7 +54,10 @@ impl Default for GenesisConfig {
 pub fn secure_output_dir(output: impl AsRef<Path>) -> Result<PathBuf, String> {
     let out = output.as_ref();
     if out.is_absolute() {
-        return Err("onx-genesis failed: --out must be a relative path within the current directory".to_string());
+        return Err(
+            "onx-genesis failed: --out must be a relative path within the current directory"
+                .to_string(),
+        );
     }
 
     for comp in out.components() {
@@ -66,7 +69,9 @@ pub fn secure_output_dir(output: impl AsRef<Path>) -> Result<PathBuf, String> {
         }
     }
 
-    let root = env::current_dir().map_err(|err| format!("onx-genesis failed: could not determine current directory: {err}"))?;
+    let root = env::current_dir().map_err(|err| {
+        format!("onx-genesis failed: could not determine current directory: {err}")
+    })?;
     let mut out_path = root.clone();
     for comp in out.components() {
         match comp {
@@ -83,25 +88,36 @@ pub fn secure_output_dir(output: impl AsRef<Path>) -> Result<PathBuf, String> {
 
     let root_canon = fs::canonicalize(&root)
         .map_err(|err| format!("onx-genesis failed: could not canonicalize root: {err}"))?;
-    let out_canon = fs::canonicalize(&out_path)
-        .map_err(|err| format!("onx-genesis failed: could not canonicalize output directory: {err}"))?;
+    let out_canon = fs::canonicalize(&out_path).map_err(|err| {
+        format!("onx-genesis failed: could not canonicalize output directory: {err}")
+    })?;
 
     if !out_canon.starts_with(&root_canon) {
-        return Err("onx-genesis failed: output directory must be within the current directory".to_string());
+        return Err(
+            "onx-genesis failed: output directory must be within the current directory".to_string(),
+        );
     }
 
     Ok(out_canon)
 }
 pub fn parse_config(path: impl AsRef<Path>) -> Result<GenesisConfig, String> {
-    let raw = fs::read_to_string(path.as_ref())
-        .map_err(|err| format!("failed to read genesis config {}: {err}", path.as_ref().display()))?;
+    let raw = fs::read_to_string(path.as_ref()).map_err(|err| {
+        format!(
+            "failed to read genesis config {}: {err}",
+            path.as_ref().display()
+        )
+    })?;
     let config: GenesisConfig = toml::from_str(&raw).map_err(|err| err.to_string())?;
     Ok(config)
 }
 
 pub fn generate_genesis(config: &GenesisConfig, output_dir: PathBuf) -> Result<(), String> {
-    fs::create_dir_all(&output_dir)
-        .map_err(|err| format!("failed to create output dir {}: {err}", output_dir.display()))?;
+    fs::create_dir_all(&output_dir).map_err(|err| {
+        format!(
+            "failed to create output dir {}: {err}",
+            output_dir.display()
+        )
+    })?;
 
     let mut balances = String::new();
     for balance in &config.balances {
@@ -115,7 +131,10 @@ pub fn generate_genesis(config: &GenesisConfig, output_dir: PathBuf) -> Result<(
 
     let mut workchains = String::new();
     for wc in &config.workchains {
-        workchains.push_str(&format!("{}:{}:{}:{};", wc.id, wc.name, wc.shard_prefix, wc.enabled));
+        workchains.push_str(&format!(
+            "{}:{}:{}:{};",
+            wc.id, wc.name, wc.shard_prefix, wc.enabled
+        ));
     }
 
     let gateway = format!(
@@ -125,10 +144,10 @@ pub fn generate_genesis(config: &GenesisConfig, output_dir: PathBuf) -> Result<(
     let genesis_boc_path = output_dir.join("genesis.boc");
     fs::write(&genesis_boc_path, &gateway).map_err(|err| err.to_string())?;
 
-    let shard_header = format!(
-        "ONX_SHARD_HEADER_BOC\nshard=0x00\nworkchain=0\nparent=masterchain_genesis#0\n"
-    );
-    fs::write(output_dir.join("shard-header-0.boc"), shard_header).map_err(|err| err.to_string())?;
+    let shard_header =
+        "ONX_SHARD_HEADER_BOC\nshard=0x00\nworkchain=0\nparent=masterchain_genesis#0\n".to_string();
+    fs::write(output_dir.join("shard-header-0.boc"), shard_header)
+        .map_err(|err| err.to_string())?;
 
     for idx in 0..4 {
         let node_cfg = format!(
@@ -138,7 +157,8 @@ pub fn generate_genesis(config: &GenesisConfig, output_dir: PathBuf) -> Result<(
             idx + 1,
             genesis_boc_path.display()
         );
-        fs::write(output_dir.join(format!("node-{}.toml", idx)), node_cfg).map_err(|err| err.to_string())?;
+        fs::write(output_dir.join(format!("node-{}.toml", idx)), node_cfg)
+            .map_err(|err| err.to_string())?;
     }
 
     Ok(())

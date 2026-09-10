@@ -23,4 +23,5 @@ jobs:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - run: cargo install cargo-fuzz --locked
-      - run: cargo fuzz run --manifest-path fuzz/Cargo.toml ${{ matrix.target }} -- -runs=10000
+      - run: cargo fuzz run ${{ matrix.target }} -- -runs=10000
+        working-directory: fuzz

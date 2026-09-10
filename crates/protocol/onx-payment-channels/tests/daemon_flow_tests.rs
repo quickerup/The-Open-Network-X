@@ -1,12 +1,12 @@
 //! Flow test for the payment-channel daemon scaffold on top of the arbiter
 //! primitives already implemented in `crates/protocol/onx-payment-channels/src/lib.rs`.
 
+use onx_data_structures::{AccountId, FullAddress, WorkchainIdent};
 use onx_payment_channels::{
     daemon::{PaymentChannelDaemon, SignedStateEnvelope},
     ChannelState, PaymentChannelArbiter,
 };
 use onx_primitives::{hash::TX_BODY_V1, SecretKey, Uint128, Uint256, Uint64};
-use onx_data_structures::{AccountId, FullAddress, WorkchainIdent};
 
 fn setup_daemon() -> (PaymentChannelDaemon, SecretKey, SecretKey) {
     let sk_a = SecretKey::from_seed(&[1u8; 32]).unwrap();
@@ -59,11 +59,7 @@ fn daemon_detects_stale_state_and_submits_dispute_before_timeout() {
         let sig_b = sk_b.sign(&TX_BODY_V1, &hash.0);
 
         daemon
-            .receive_signed_state_and_track(SignedStateEnvelope::new(
-                latest.clone(),
-                sig_a,
-                sig_b,
-            ))
+            .receive_signed_state_and_track(SignedStateEnvelope::new(latest.clone(), sig_a, sig_b))
             .unwrap();
         payments += 1;
     }
@@ -94,5 +90,8 @@ fn daemon_detects_stale_state_and_submits_dispute_before_timeout() {
         .unwrap();
 
     assert!(daemon.arbiter.is_settled);
-    assert_eq!(daemon.arbiter.challenge_start_lt, Some(Uint64::from(100u64)));
+    assert_eq!(
+        daemon.arbiter.challenge_start_lt,
+        Some(Uint64::from(100u64))
+    );
 }

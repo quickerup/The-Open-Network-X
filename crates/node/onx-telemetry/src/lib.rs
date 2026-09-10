@@ -46,11 +46,9 @@ impl TelemetryHandle {
             "Latest committed block height tracked by the local node"
         )
         .map_err(|err| err.to_string())?;
-        let connected_peer_count = register_gauge!(
-            "connected_peer_count",
-            "Current number of connected peers"
-        )
-        .map_err(|err| err.to_string())?;
+        let connected_peer_count =
+            register_gauge!("connected_peer_count", "Current number of connected peers")
+                .map_err(|err| err.to_string())?;
         let transaction_pool_size = register_gauge!(
             "transaction_pool_size",
             "Current size of the transaction pool"
@@ -119,7 +117,9 @@ impl TelemetryHandle {
         let mut buffer = Vec::new();
         let encoder = TextEncoder::new();
         let metric_families = prometheus::default_registry().gather();
-        encoder.encode(&metric_families, &mut buffer).map_err(|err| err.to_string())?;
+        encoder
+            .encode(&metric_families, &mut buffer)
+            .map_err(|err| err.to_string())?;
         Ok(String::from_utf8_lossy(&buffer).into_owned())
     }
 }
@@ -129,7 +129,9 @@ pub async fn serve_metrics(config: TelemetryConfig) -> Result<(), String> {
         .metrics_bind
         .parse::<SocketAddr>()
         .map_err(|err| err.to_string())?;
-    let listener = TcpListener::bind(addr).await.map_err(|err| err.to_string())?;
+    let listener = TcpListener::bind(addr)
+        .await
+        .map_err(|err| err.to_string())?;
     let registry = prometheus::default_registry();
     let _ = registry;
     let server = Handle::current();
@@ -139,7 +141,9 @@ pub async fn serve_metrics(config: TelemetryConfig) -> Result<(), String> {
         let metric_families = prometheus::default_registry().gather();
         let encoder = TextEncoder::new();
         let mut buf = Vec::new();
-        encoder.encode(&metric_families, &mut buf).map_err(|err| err.to_string())?;
+        encoder
+            .encode(&metric_families, &mut buf)
+            .map_err(|err| err.to_string())?;
         let payload = String::from_utf8_lossy(&buf);
         let response = format!(
             "HTTP/1.1 200 OK\r\nContent-Type: text/plain; version=0.9; charset=utf-8\r\nContent-Length: {}\r\n\r\n{}",

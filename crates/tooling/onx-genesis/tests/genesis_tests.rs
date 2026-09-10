@@ -7,7 +7,10 @@ fn emits_canonical_genesis_and_bootstrap_files() {
     let temp = std::env::temp_dir().join(format!(
         "onx-genesis-{}-{}",
         std::process::id(),
-        SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos()
+        SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_nanos()
     ));
     let _ = fs::remove_dir_all(&temp);
 
