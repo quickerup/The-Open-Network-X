@@ -5,8 +5,8 @@
 
 ## 1. Reference
 
-- `whitepaper.md` §3.3.1–§3.3.5: private/public overlays, broadcast, streaming, and erasure coding.
-- `whitepaper.md` §2.6.10: validator block-candidate propagation.
+- `WHITEPAPER.md` §3.3.1–§3.3.5: private/public overlays, broadcast, streaming, and erasure coding.
+- `WHITEPAPER.md` §2.6.10: validator block-candidate propagation.
 - `docs/specification/consensus.md` §3.4: candidate validation and quorum trigger.
 
 ## 2. Requirement
@@ -15,7 +15,7 @@ ONX requires shard-scoped dissemination that permits a validator group to recons
 
 ## 3. ONX interpretation
 
-Each active shard and validator task group has an authenticated overlay identified by the shard identifier and assignment epoch. Members gossip signed announcements and stream candidate payloads in ordered chunks. A sender erasure-codes a payload into enough chunks for reconstruction from a declared threshold, forwards chunks opportunistically, and verifies the candidate hash after reconstruction (`whitepaper.md` §3.3; §2.6.10). The Consensus specification, not this document, determines when block-candidate propagation begins, who may propose, and what signatures commit a block. Overlay reachability, timing, and duplicate arrival never alter validity or quorum weight.
+Each active shard and validator task group has an authenticated overlay identified by the shard identifier and assignment epoch. Members gossip signed announcements and stream candidate payloads in ordered chunks. A sender erasure-codes a payload into enough chunks for reconstruction from a declared threshold, forwards chunks opportunistically, and verifies the candidate hash after reconstruction (`WHITEPAPER.md` §3.3; §2.6.10). The Consensus specification, not this document, determines when block-candidate propagation begins, who may propose, and what signatures commit a block. Overlay reachability, timing, and duplicate arrival never alter validity or quorum weight.
 
 ## 4. Serialization
 

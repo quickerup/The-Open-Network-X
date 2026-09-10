@@ -3,14 +3,14 @@
 **Status:** Draft
 **Scope:** Peer identity, 256-bit abstract addresses, key descriptions, low-level UDP/TCP transport encodings, channel and tunnel identifiers, zero-channel bootstrapping, and the Reliable Large Datagram Protocol (RLDP) for Open Network X (ONX).
 
-*Note: This document is the first of three Networking sub-specifications (Architecture sequence item 8, partially resolving ONX-ARCH-010). Distributed Hash Table (DHT, `whitepaper.md` §3.2) and Overlay Networks / Multicasting (`whitepaper.md` §3.3) are covered in separate upcoming sub-specifications (`networking-dht.md` and `networking-overlay.md`).*
+*Note: This document is the first of three Networking sub-specifications (Architecture sequence item 8, partially resolving ONX-ARCH-010). Distributed Hash Table (DHT, `WHITEPAPER.md` §3.2) and Overlay Networks / Multicasting (`WHITEPAPER.md` §3.3) are covered in separate upcoming sub-specifications (`networking-dht.md` and `networking-overlay.md`).*
 
 ---
 
 ## 1. Reference
 
-- `whitepaper.md`, §3.1: Abstract Datagram Network Layer (ADNL), abstract addresses, key descriptions, channels, tunnels, zero channel, and RLDP (§3.1.1–§3.1.9).
-- `whitepaper.md`, §1.0: Brief description of network proxy/anonymizer (TON Proxy, §1.0 / §4.1.10).
+- `WHITEPAPER.md`, §3.1: Abstract Datagram Network Layer (ADNL), abstract addresses, key descriptions, channels, tunnels, zero channel, and RLDP (§3.1.1–§3.1.9).
+- `WHITEPAPER.md`, §1.0: Brief description of network proxy/anonymizer (TON Proxy, §1.0 / §4.1.10).
 - `INSTRUCTIONS.md`, §9, §13: Separation of network protocol from application/consensus behavior.
 - `docs/specification/architecture.md`: Architecture sequence item 8 (Networking) and open question ONX-ARCH-010 (peer identity, transport, DHT, overlay routing).
 - `docs/specification/protocol-primitives.md`: SHA-256 digests, Ed25519 keys/signatures, domain separation tags, big-endian integer encodings.
@@ -64,7 +64,7 @@ ADNL defines two primary transport packet encodings:
 - **Point-to-Point Channel Identifiers (§3.1.5):** Two peers exchanging large volumes of traffic establish a point-to-point channel. A 256-bit channel ID is derived as:
   $$\text{channel\_id} = \text{SHA-256}(\text{shared\_secret} \parallel \text{sender\_address} \parallel \text{recipient\_address})$$
   When a UDP packet's first 32 bytes match an active channel ID, the recipient processes the payload directly using the cached symmetric channel keys.
-- **Tunnel Identifiers and Proxy Routing (§3.1.6):** Channel identifiers can represent multi-hop tunnel routes. Intermediate proxy nodes inspect the channel ID, decrypt/re-encrypt layer wrappers (garlic/onion routing), and forward the datagram to the next tunnel hop without inspecting inner payloads. This provides the transport foundation for ONX Proxy (`whitepaper.md` §4.1.10).
+- **Tunnel Identifiers and Proxy Routing (§3.1.6):** Channel identifiers can represent multi-hop tunnel routes. Intermediate proxy nodes inspect the channel ID, decrypt/re-encrypt layer wrappers (garlic/onion routing), and forward the datagram to the next tunnel hop without inspecting inner payloads. This provides the transport foundation for ONX Proxy (`WHITEPAPER.md` §4.1.10).
 - **Zero-Channel Bootstrapping (§3.1.7):**
   - Reserved channel ID $0\times0000...0000$ (32 zero bytes).
   - Used when a client or bootstrapping node knows a target's IP address and UDP port but does not yet know its abstract address or key description (e.g. initial network boot).

@@ -16,10 +16,10 @@ temporary MVP simplification explicitly.
 
 ## Reference
 
-- `whitepaper.md`, §2.1.1--§2.1.5: masterchain, workchain, and shardchain roles.
-- `whitepaper.md`, §2.1.8--§2.1.10: shard identity and dynamic sharding.
-- `whitepaper.md`, §2.1.13--§2.1.14: masterchain references as global state.
-- `whitepaper.md`, §2.7.1--§2.7.9: shard-tree configuration and split/merge behavior.
+- `WHITEPAPER.md`, §2.1.1--§2.1.5: masterchain, workchain, and shardchain roles.
+- `WHITEPAPER.md`, §2.1.8--§2.1.10: shard identity and dynamic sharding.
+- `WHITEPAPER.md`, §2.1.13--§2.1.14: masterchain references as global state.
+- `WHITEPAPER.md`, §2.7.1--§2.7.9: shard-tree configuration and split/merge behavior.
 - `INSTRUCTIONS.md`, §14--§15: sharding is protocol-level and the three chain
   concepts must remain distinct.
 

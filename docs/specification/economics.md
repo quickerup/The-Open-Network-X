@@ -4,7 +4,7 @@
 
 ## 1. Reference
 
-- `whitepaper.md` Appendix A: denomination, initial supply, validator rewards, and slashing/burn examples.
+- `WHITEPAPER.md` Appendix A: denomination, initial supply, validator rewards, and slashing/burn examples.
 - `docs/specification/consensus.md`: stake, rewards, and slashing authority.
 - `docs/decisions/ADR-0019-economics-parameters.md`: resolves ONX-ARCH-008 parameters.
 

@@ -14,7 +14,7 @@ not a compatibility specification and must not be read as one.
 
 ## Reference
 
-The primary reference is `whitepaper.md`:
+The primary reference is `WHITEPAPER.md`:
 
 | Reference section | Architectural observation used here |
 | --- | --- |

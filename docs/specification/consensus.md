@@ -7,14 +7,14 @@
 
 ## 1. Reference
 
-- `whitepaper.md`, §2.1.13–§2.1.17: Masterchain/shardchain coupling, vertical block correction.
-- `whitepaper.md`, §2.6.1–§2.6.7: Validator election, stake ceiling $L$, load parameter $l$, actual stake formula, stake unfreezing lockup.
-- `whitepaper.md`, §2.6.3–§2.6.5: Nominators, fishermen, and collators as distinct protocol roles.
-- `whitepaper.md`, §2.6.8–§2.6.9: Rotating per-shard validator task groups and deterministic priority ordering.
-- `whitepaper.md`, §2.6.10–§2.6.12: Block-candidate propagation (Reed-Solomon/RaptorQ erasure coding), validation, BFT quorum ($2/3$ stake threshold).
-- `whitepaper.md`, §2.6.13–§2.6.19: Block retention, header propagation, masterchain block generation, block retention mitigation.
-- `whitepaper.md`, §2.6.20–§2.6.21: Late-signature reward decay ($0.9^k$) and signature depth $d$.
-- `whitepaper.md`, §2.6.22–§2.6.28: Relative validity, relative reliability, recursive reliability, and the 2-month challenge window.
+- `WHITEPAPER.md`, §2.1.13–§2.1.17: Masterchain/shardchain coupling, vertical block correction.
+- `WHITEPAPER.md`, §2.6.1–§2.6.7: Validator election, stake ceiling $L$, load parameter $l$, actual stake formula, stake unfreezing lockup.
+- `WHITEPAPER.md`, §2.6.3–§2.6.5: Nominators, fishermen, and collators as distinct protocol roles.
+- `WHITEPAPER.md`, §2.6.8–§2.6.9: Rotating per-shard validator task groups and deterministic priority ordering.
+- `WHITEPAPER.md`, §2.6.10–§2.6.12: Block-candidate propagation (Reed-Solomon/RaptorQ erasure coding), validation, BFT quorum ($2/3$ stake threshold).
+- `WHITEPAPER.md`, §2.6.13–§2.6.19: Block retention, header propagation, masterchain block generation, block retention mitigation.
+- `WHITEPAPER.md`, §2.6.20–§2.6.21: Late-signature reward decay ($0.9^k$) and signature depth $d$.
+- `WHITEPAPER.md`, §2.6.22–§2.6.28: Relative validity, relative reliability, recursive reliability, and the 2-month challenge window.
 - `INSTRUCTIONS.md`, §10, §14, §15: Deterministic consensus, protocol boundaries, and state isolation.
 - `docs/specification/architecture.md`: Open question ONX-ARCH-005 (finality and invalid-block claims), resolved by this specification and ADR-0008.
 - `docs/specification/blocks.md`: Structural block validity, parent references, masterchain coupling, and header split/merge flags.

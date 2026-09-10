@@ -9,7 +9,7 @@ Architecture sequence work requires this protocol layer to be explicit before im
 
 ## Reference
 
-See `docs/specification/economics.md` §1 and its cited `whitepaper.md` subsections.
+See `docs/specification/economics.md` §1 and its cited `WHITEPAPER.md` subsections.
 
 ## Problem
 

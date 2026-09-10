@@ -7,7 +7,7 @@
 
 `docs/specification/architecture.md`'s specification sequence (item 8) requires a Networking specification to define how ONX nodes identify each other, authenticate messages, transmit datagrams, discover peers, and propagate blocks. Open question **ONX-ARCH-010** asks: "What are the peer-identity/transport (ADNL), distributed-hash-table (DHT), and overlay/gossip protocol rules nodes use to find each other and propagate blocks?"
 
-`whitepaper.md` Chapter 3 describes three distinct networking layers:
+`WHITEPAPER.md` Chapter 3 describes three distinct networking layers:
 1. Abstract Datagram Network Layer (ADNL) and RLDP (§3.1);
 2. TON DHT (§3.2);
 3. Overlay Networks and Multicasting (§3.3).
@@ -16,7 +16,7 @@ ONX needed to decide how to structure the networking specifications and what cor
 
 ## Reference
 
-- `whitepaper.md`, §3.1: Abstract Datagram Network Layer (ADNL), abstract network addresses, key descriptions, channels, tunnels, zero channel, and RLDP (§3.1.1–§3.1.9).
+- `WHITEPAPER.md`, §3.1: Abstract Datagram Network Layer (ADNL), abstract network addresses, key descriptions, channels, tunnels, zero channel, and RLDP (§3.1.1–§3.1.9).
 - `INSTRUCTIONS.md`, §9, §13: Layer separation and independent specification of network protocols.
 - `docs/specification/architecture.md`: Item 8 (Networking) and open question ONX-ARCH-010.
 - `docs/specification/protocol-primitives.md`: Canonical cryptographic hash (SHA-256) and signature scheme (Ed25519).

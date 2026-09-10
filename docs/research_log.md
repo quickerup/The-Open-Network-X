@@ -1,6 +1,6 @@
 # Spec Tracker Research Log
 
-Automated log of commits tracked against whitepaper.md.
+Automated log of commits tracked against WHITEPAPER.md.
 
 ## Commit 058d7856fe31529dc72b8bcf85775f22619bd5a7
 

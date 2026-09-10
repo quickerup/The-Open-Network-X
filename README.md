@@ -68,7 +68,7 @@ Similarity between ONX and existing TON architecture is intentional where that s
 
 ## The white paper is the starting point
 
-The original TON white paper (`whitepaper.md`) is the primary historical and architectural reference for this project, and is included in this repository as a reference document. ONX does not modify the white paper to make the implementation easier — instead, the implementation adapts to the specification:
+The original TON white paper (`WHITEPAPER.md`) is the primary historical and architectural reference for this project, and is included in this repository as a reference document. ONX does not modify the white paper to make the implementation easier — instead, the implementation adapts to the specification:
 
 - Where the white paper is precise, ONX strives for faithful implementation.
 - Where the white paper is ambiguous, ONX documents its interpretation.
@@ -147,7 +147,7 @@ See [`ROADMAP.md`](ROADMAP.md) for the full changelog and roadmap of what has be
 .
 ├── README.md
 ├── INSTRUCTIONS.md          # Development principles for this repository
-├── whitepaper.md            # Reference white paper (unmodified)
+├── WHITEPAPER.md            # Reference white paper (unmodified)
 ├── Cargo.toml               # Rust workspace
 ├── crates/
 │   ├── onx-primitives/      # Canonical encoding, hashing, and signatures
@@ -185,4 +185,4 @@ Open Network X is an independent project. ONX, Open Network X, and Onyx should n
 
 ## License
 
-Open Network X is licensed under the [Apache License, Version 2.0](LICENSE), as decided in [ADR-0015](docs/decisions/ADR-0015-project-license.md). Individual reference materials may have their own copyright and licensing requirements — see `whitepaper.md` for the applicable source and attribution information.
+Open Network X is licensed under the [Apache License, Version 2.0](LICENSE), as decided in [ADR-0015](docs/decisions/ADR-0015-project-license.md). Individual reference materials may have their own copyright and licensing requirements — see `WHITEPAPER.md` for the applicable source and attribution information.

@@ -12,8 +12,8 @@
 - `docs/specification/state-model.md` §3.3–§4.2: the `Cell`/`BagOfCells` representation this instruction set's `code` and `data` operate on, including `MAX_CELL_DATA_BYTES = 128`, `MAX_CELL_REFS = 4`, and the `is_special` flag.
 - `docs/specification/protocol-primitives.md`: canonical fixed-width integer encoding (`Uint8`–`Uint256`, `Int8`–`Int256`) and domain-separated SHA-256/Ed25519 primitives this instruction set's arithmetic and cryptographic opcodes reuse rather than redefine.
 - `docs/specification/transactions.md`: `MAX_TENTATIVE_GAS = 10,000`, the External Inbound tentative-execution gas cap this document's cryptographic opcode pricing (§3.6) is checked against for plausibility.
-- `whitepaper.md` §2.1.20: TVM's feature list (stack machine, cell-based value model, algebraic data types, fixed-width arithmetic in unsigned/signed/modulo flavors, bit/byte strings, ECC and hash primitives, closures) — as `execution.md` §3.1 already notes, this is a feature list, not an opcode table; no such table exists in the available reference material, so this document is an ONX-original design within the constraints that feature list and `execution.md`'s contract establish, not a transcription of any existing implementation (`INSTRUCTIONS.md` §1, §6).
-- `whitepaper.md` §5.1.9, `docs/specification/payment-channels.md`: the light-client Merkle-proof-as-ordinary-value use case that motivates keeping cell-reference-passing and hashing available on pruned branches even though content access is not (§3.5).
+- `WHITEPAPER.md` §2.1.20: TVM's feature list (stack machine, cell-based value model, algebraic data types, fixed-width arithmetic in unsigned/signed/modulo flavors, bit/byte strings, ECC and hash primitives, closures) — as `execution.md` §3.1 already notes, this is a feature list, not an opcode table; no such table exists in the available reference material, so this document is an ONX-original design within the constraints that feature list and `execution.md`'s contract establish, not a transcription of any existing implementation (`INSTRUCTIONS.md` §1, §6).
+- `WHITEPAPER.md` §5.1.9, `docs/specification/payment-channels.md`: the light-client Merkle-proof-as-ordinary-value use case that motivates keeping cell-reference-passing and hashing available on pruned branches even though content access is not (§3.5).
 - `docs/specification/architecture.md`: open question **ONX-ARCH-006** (VM rules per workchain), partially resolved by `execution.md`; this document resolves the "concrete instruction set" portion for the basic workchain specifically. Which VM(s) other workchains use remains open.
 
 ---
@@ -36,7 +36,7 @@ This document defines the smallest instruction set that satisfies every requirem
 
 ### 3.2 Stack value model
 
-The VM is a stack machine (`whitepaper.md` §2.1.20) with **no first-class continuations**: control flow (§3.5) uses a simple internal call-stack of return addresses, not the closures `whitepaper.md`'s feature list mentions. `execution.md` §3.3 does not require closures, and per `whitepaper.md` §2.8.16–§2.8.17's own warning about how costly it is to retrofit foundational VM semantics, ONX defers first-class continuations rather than half-committing to them now; a future revision may add them as a wholly new value kind without breaking this document's opcodes.
+The VM is a stack machine (`WHITEPAPER.md` §2.1.20) with **no first-class continuations**: control flow (§3.5) uses a simple internal call-stack of return addresses, not the closures `WHITEPAPER.md`'s feature list mentions. `execution.md` §3.3 does not require closures, and per `WHITEPAPER.md` §2.8.16–§2.8.17's own warning about how costly it is to retrofit foundational VM semantics, ONX defers first-class continuations rather than half-committing to them now; a future revision may add them as a wholly new value kind without breaking this document's opcodes.
 
 The operand stack holds values of exactly five kinds:
 
@@ -76,7 +76,7 @@ A contract's `code` (`execution.md` §3.2) is a `Cell` whose up to `MAX_CELL_DAT
 
 #### 3.5.3 Pruned branches and `AbsentNode`
 
-Per `execution.md` §3.5, a `Cell` may be a pruned Merkle-proof branch (`is_special = true`, §3.2's `Cell.is_special_flag`). This instruction set draws the `AbsentNode` boundary at **content access**, not at reference-passing or hashing, matching `whitepaper.md` §5.1.9's design intent that a Merkle proof's *shape and hash* remain usable even where its *content* is deliberately absent:
+Per `execution.md` §3.5, a `Cell` may be a pruned Merkle-proof branch (`is_special = true`, §3.2's `Cell.is_special_flag`). This instruction set draws the `AbsentNode` boundary at **content access**, not at reference-passing or hashing, matching `WHITEPAPER.md` §5.1.9's design intent that a Merkle proof's *shape and hash* remain usable even where its *content* is deliberately absent:
 
 - `CTOS` (§4.4) raises `AbsentNode` if its operand `Cell` is a pruned special cell — this is the only opcode that raises it.
 - `LDREF` (§4.4) never raises `AbsentNode`: it hands back the child `Cell` reference itself (pruned or not) without reading its content, so a contract can pass a pruned reference along (e.g. store it, or hash it) without being forced to dereference it.

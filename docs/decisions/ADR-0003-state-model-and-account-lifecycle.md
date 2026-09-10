@@ -5,12 +5,12 @@
 
 ## Context
 
-The historical reference (`whitepaper.md`) describes an authenticated blockchain state architecture based on tagged TVM Cells, Bag-of-Cells (BoC) cell DAGs, and Merkle-Patricia tree hashmaps. Accounts exist within shardchains and transition through state states as transactions are executed. To ensure deterministic state execution, state proofs, and light client verification, ONX must formalize its account state machine, cell DAG hashing scheme, and Merkle state commitments.
+The historical reference (`WHITEPAPER.md`) describes an authenticated blockchain state architecture based on tagged TVM Cells, Bag-of-Cells (BoC) cell DAGs, and Merkle-Patricia tree hashmaps. Accounts exist within shardchains and transition through state states as transactions are executed. To ensure deterministic state execution, state proofs, and light client verification, ONX must formalize its account state machine, cell DAG hashing scheme, and Merkle state commitments.
 
 ## Reference
 
-- `whitepaper.md`, §2.3.1–§2.3.18: Account IDs, hashmaps, smart contract persistent storage, TVM cells, and Merkle proofs.
-- `whitepaper.md`, §2.5.1–§2.5.15: Bag-of-Cells representation and global state hashing.
+- `WHITEPAPER.md`, §2.3.1–§2.3.18: Account IDs, hashmaps, smart contract persistent storage, TVM cells, and Merkle proofs.
+- `WHITEPAPER.md`, §2.5.1–§2.5.15: Bag-of-Cells representation and global state hashing.
 - `INSTRUCTIONS.md`, §10, §12, §16, §17: Consensus-critical code, serialization standards, VM, and smart contracts.
 - `docs/specification/architecture.md`: State model requirements and architectural boundaries.
 - `docs/specification/protocol-primitives.md`: Cryptographic hashing standards and domain separation.

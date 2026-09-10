@@ -4,15 +4,15 @@
 
 ## 1. Reference
 
-- `whitepaper.md` §5.1.1–§5.1.4: trustless point-to-point channels and on-chain arbiter.
-- `whitepaper.md` §5.1.5: asynchronous two-workchain channel.
-- `whitepaper.md` §5.1.7: chainable conditional promises.
-- `whitepaper.md` §5.1.9: embedded Merkle-proof verification.
-- `whitepaper.md` §5.2: multi-hop network and path finding.
+- `WHITEPAPER.md` §5.1.1–§5.1.4: trustless point-to-point channels and on-chain arbiter.
+- `WHITEPAPER.md` §5.1.5: asynchronous two-workchain channel.
+- `WHITEPAPER.md` §5.1.7: chainable conditional promises.
+- `WHITEPAPER.md` §5.1.9: embedded Merkle-proof verification.
+- `WHITEPAPER.md` §5.2: multi-hop network and path finding.
 
 ## 2. Requirement and dependency
 
-A channel is an on-chain arbiter contract funded by two parties; off-chain signed states allocate that locked value, while either party may settle the latest valid state on chain. The asynchronous two-workchain variant avoids a round-trip confirmation before conditional transfer completion. Conditional, chainable promises permit intermediaries to forward a payment, and a network requires path discovery (`whitepaper.md` §5.1–§5.2).
+A channel is an on-chain arbiter contract funded by two parties; off-chain signed states allocate that locked value, while either party may settle the latest valid state on chain. The asynchronous two-workchain variant avoids a round-trip confirmation before conditional transfer completion. Conditional, chainable promises permit intermediaries to forward a payment, and a network requires path discovery (`WHITEPAPER.md` §5.1–§5.2).
 
 **Implementation MUST NOT begin** until the Execution specification's reserved Merkle-proof/pruned-branch primitive is concretely implemented by the future instruction-set artifact. `execution.md` §3.5 accepts the reservation, but it is not yet executable; this is ONX-ARCH-009's remaining dependency.
 

@@ -7,7 +7,7 @@
 
 ## 1. Reference
 
-- `whitepaper.md`, §2.4.1–§2.4.27: Messages between shardchains, actor model, message values, external inbound/outbound messages, output queues, hypercube routing, fast path delivery, and double-delivery prevention.
+- `WHITEPAPER.md`, §2.4.1–§2.4.27: Messages between shardchains, actor model, message values, external inbound/outbound messages, output queues, hypercube routing, fast path delivery, and double-delivery prevention.
   - §2.4.5: Message value model as `(currency_id, value)` pairs.
   - §2.4.6: External messages ("messages from nowhere") and admission gas-limit rules.
   - §2.4.16–§2.4.17: Output-queue-only model and per-account delivery ordering.

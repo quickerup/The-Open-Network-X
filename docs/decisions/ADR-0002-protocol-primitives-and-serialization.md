@@ -5,12 +5,12 @@
 
 ## Context
 
-The historical reference (`whitepaper.md`) describes a flexible multi-blockchain architecture using SHA-256 for block hashing, 256-bit ECC public keys for account identification and signatures, and TL-B schemes for data representation. To ensure consensus-critical determinism across independent node implementations, ONX must establish explicit rules for cryptographic algorithms, integer encodings, domain separation, and canonical binary serialization.
+The historical reference (`WHITEPAPER.md`) describes a flexible multi-blockchain architecture using SHA-256 for block hashing, 256-bit ECC public keys for account identification and signatures, and TL-B schemes for data representation. To ensure consensus-critical determinism across independent node implementations, ONX must establish explicit rules for cryptographic algorithms, integer encodings, domain separation, and canonical binary serialization.
 
 ## Reference
 
-- `whitepaper.md`, §2.2.8–§2.2.10: Block hashes and SHA-256 assumptions.
-- `whitepaper.md`, §2.3.1: 256-bit ECC public key account identifiers.
+- `WHITEPAPER.md`, §2.2.8–§2.2.10: Block hashes and SHA-256 assumptions.
+- `WHITEPAPER.md`, §2.3.1: 256-bit ECC public key account identifiers.
 - `INSTRUCTIONS.md`, §10, §11, §12, §24: Consensus-critical code requirements, cryptographic primitives, serialization standards, and ADR formatting rules.
 - `docs/specification/protocol-primitives.md`: Protocol Primitives Specification.
 - `docs/specification/data-structures.md`: Canonical Data Structures Specification.

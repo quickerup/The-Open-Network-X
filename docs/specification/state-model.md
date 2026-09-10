@@ -7,8 +7,8 @@
 
 ## 1. Reference
 
-- `whitepaper.md`, §2.3.1–§2.3.18: Account IDs, hashmaps, smart contract persistent storage, TVM cells, and Merkle proofs.
-- `whitepaper.md`, §2.5.1–§2.5.15: Bag-of-Cells representation, acyclic directed graphs of cells, and global state hashing.
+- `WHITEPAPER.md`, §2.3.1–§2.3.18: Account IDs, hashmaps, smart contract persistent storage, TVM cells, and Merkle proofs.
+- `WHITEPAPER.md`, §2.5.1–§2.5.15: Bag-of-Cells representation, acyclic directed graphs of cells, and global state hashing.
 - `INSTRUCTIONS.md`, §10, §12, §16, §17: Consensus-critical code, serialization standards, Virtual Machine semantics, and smart contract behavior.
 - `docs/specification/architecture.md`: Open question ONX-ARCH-003 regarding state representation and state transitions.
 - `docs/specification/protocol-primitives.md`: SHA-256 digests, Ed25519 signatures, and integer encoding.

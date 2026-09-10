@@ -1,6 +1,6 @@
 [files]
 extend-exclude = [
-    "whitepaper.md",
+    "WHITEPAPER.md",
     "docs/whitepaper-page-header-review.md",
 ]
 
