@@ -14,7 +14,7 @@ use std::path::Path;
 use std::pin::Pin;
 use std::sync::Arc;
 use std::fs;
-use std::time::{SystemTime, UNIX_EPOCH, Duration};
+use std::time::{Duration, Instant};
 use tokio::time::{interval, sleep};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -183,20 +183,16 @@ pub async fn run_daemon(config: OnxdConfig) -> Result<(), String> {
 
     let storage = StateStorage::open(&config.storage_path)
         .map_err(|err| format!("failed to initialize state storage: {err}"))?;
-    let _ = storage;
+    let _storage = storage;
 
     let metrics = TelemetryHandle::new().map_err(|err| err.to_string())?;
-    metrics.set_block_height(0);
-    metrics.set_connected_peers(0);
+    metrics.set_connected_peers(config.peers.len() as i64);
     metrics.set_tx_pool_size(0);
 
     let metrics_cfg = TelemetryConfig::default();
     let metrics_task = tokio::spawn(async move {
         let _ = serve_metrics(metrics_cfg).await;
     });
-
-    let start = SystemTime::now().duration_since(UNIX_EPOCH).unwrap_or_default().as_secs();
-    let _ = start;
 
     let runtime_shutdown = if let Some(ms) = config.shutdown_after_ms {
         Some(sleep(Duration::from_millis(ms)))
@@ -247,6 +243,8 @@ pub async fn run_daemon(config: OnxdConfig) -> Result<(), String> {
             RoundTimeouts::default(),
         )
         .map_err(|err| format!("failed to initialize consensus engine: {err}"))?;
+        let metrics = metrics.clone();
+        let started_at = Instant::now();
 
         let mut rldp = RldpSender::new(
             Uint256([0u8; 32]),
@@ -263,10 +261,18 @@ pub async fn run_daemon(config: OnxdConfig) -> Result<(), String> {
                 let _ = adnl.local_addr();
                 let _ = dht.contact();
                 let _ = dht.closest_contacts(target, 8);
+                let now = started_at.elapsed().as_secs();
+                if engine.on_timeout(now) {
+                    metrics.track_consensus_phase("timeout");
+                }
                 let _ = engine.round();
                 let _ = engine.step();
                 let _ = engine.leader();
-                let _ = engine.finalized();
+                let height = engine
+                    .finalized()
+                    .map(|block| block.height as i64)
+                    .unwrap_or(0);
+                metrics.set_block_height(height);
                 let _ = rldp.next_round();
             }
         });

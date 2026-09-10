@@ -106,7 +106,13 @@ class SimulationHarness:
             # their ADNL/DHT/consensus/RLDP scaffolds and hit the startup path.
             time.sleep(min(0.5, max(0.1, self.scenario.target_seconds)))
 
-            for proc in processes:
+            startup_failures = []
+            for node_id, proc in enumerate(processes):
+                if proc.poll() is not None:
+                    startup_failures.append({
+                        "node_id": node_id,
+                        "exit_code": proc.returncode,
+                    })
                 if proc.poll() is None:
                     proc.terminate()
                 try:
@@ -114,6 +120,17 @@ class SimulationHarness:
                 except subprocess.TimeoutExpired:
                     proc.kill()
                     proc.wait(timeout=3)
+
+            node_results = []
+            for node_id, proc in enumerate(processes):
+                stdout, stderr = proc.communicate()
+                node_results.append({
+                    "node_id": node_id,
+                    "state": "started" if node_id not in {failure["node_id"] for failure in startup_failures} else "exited_during_startup",
+                    "exit_code": proc.returncode,
+                    "stdout": stdout[-4000:],
+                    "stderr": stderr[-4000:],
+                })
 
             elapsed = time.monotonic() - self.started
             report = {
@@ -124,13 +141,15 @@ class SimulationHarness:
                     "bandwidth_mbps": self.scenario.bandwidth_mbps,
                     "drop_pct": self.scenario.drop_pct,
                 },
-                "nodes": [
-                    {"node_id": node_id, "state": "onxd_process_started"}
-                    for node_id in range(self.scenario.node_count)
-                ],
+                "nodes": node_results,
                 "consensus": {
-                    "finality": self.scenario.rounds,
-                    "fork_divergence": False,
+                    "finality": None,
+                    "fork_divergence": None,
+                    "verification": "unavailable: onxd emitted no finalized height or state root",
+                },
+                "process_validation": {
+                    "startup_failures": startup_failures,
+                    "all_started": not startup_failures,
                 },
                 "metrics": {
                     "elapsed_seconds": round(elapsed, 6),
@@ -175,14 +194,15 @@ def main() -> int:
     out_path = Path(args.out)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
+    status = "inconclusive" if report["consensus"]["finality"] is None else "pass"
     print(json.dumps({
-        "status": "pass",
+        "status": status,
         "node_count": report["scenario"]["node_count"],
         "rounds": report["scenario"]["rounds"],
         "latency_ms": report["scenario"]["latency_ms"],
         "fork_divergence": report["consensus"]["fork_divergence"],
     }, indent=2))
-    return 0
+    return 0 if status == "pass" else 1
 
 
 if __name__ == "__main__":
