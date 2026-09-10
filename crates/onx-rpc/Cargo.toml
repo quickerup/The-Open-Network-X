@@ -1,0 +1,22 @@
+[package]
+name = "onx-rpc"
+version = "0.1.0"
+edition = "2021"
+description = "Deterministic HTTP JSON-RPC and binary Lite Client gateway for ONX nodes."
+license = "Apache-2.0"
+publish = false
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1.38", features = ["full"] }
+axum = "0.7"
+tower-http = { version = "0.5", features = ["cors"] }
+reqwest = { version = "0.12", features = ["json", "stream"], optional = true }
+onx-state-model = { path = "../onx-state-model" }
+onx-data-structures = { path = "../onx-data-structures" }
+onx-primitives = { path = "../onx-primitives" }
+onx-transactions = { path = "../onx-transactions" }
+
+[dev-dependencies]
+reqwest = { version = "0.12", features = ["json", "stream"] }

@@ -1,5 +1,18 @@
+use onx_consensus::{ConsensusEngine, RoundTimeouts, ValidatorSetEntry};
+use onx_data_structures::{ShardIdent, WorkchainIdent};
+use onx_execution::ExecutionContext;
+use onx_networking::{
+    AdnlTransportNode, DhtContact, DhtDaemon, DhtRpc, DhtRpcResponse, DhtTransport,
+    NetworkError, RldpConfig, RldpSender,
+};
+use onx_primitives::{SecretKey, Uint64, Uint256};
+use onx_state_model::StateStorage;
 use onx_telemetry::{serve_metrics, TelemetryConfig, TelemetryHandle};
+use std::future::Future;
+use std::net::SocketAddr;
 use std::path::Path;
+use std::pin::Pin;
+use std::sync::Arc;
 use std::fs;
 use std::time::{SystemTime, UNIX_EPOCH, Duration};
 use tokio::time::{interval, sleep};
@@ -151,9 +164,26 @@ pub fn parse_cli_args(args: &[String]) -> Result<OnxdConfig, String> {
     Ok(config)
 }
 
+#[derive(Clone)]
+struct NullDhtTransport;
+
+impl DhtTransport for NullDhtTransport {
+    fn call<'a>(
+        &'a self,
+        _recipient: DhtContact,
+        _request: DhtRpc,
+    ) -> Pin<Box<dyn Future<Output = Result<DhtRpcResponse, NetworkError>> + Send + 'a>> {
+        Box::pin(async { Ok(DhtRpcResponse::Pong) })
+    }
+}
+
 pub async fn run_daemon(config: OnxdConfig) -> Result<(), String> {
     fs::create_dir_all(&config.storage_path)
         .map_err(|err| format!("failed to initialize storage path {}: {err}", config.storage_path))?;
+
+    let storage = StateStorage::open(&config.storage_path)
+        .map_err(|err| format!("failed to initialize state storage: {err}"))?;
+    let _ = storage;
 
     let metrics = TelemetryHandle::new().map_err(|err| err.to_string())?;
     metrics.set_block_height(0);
@@ -179,10 +209,63 @@ pub async fn run_daemon(config: OnxdConfig) -> Result<(), String> {
         let bind = config.network_bind.clone();
         let role = config.role;
         let peers = config.peers.clone();
+        let _ = (bind.clone(), role, peers);
+
+        let addr = bind
+            .parse::<SocketAddr>()
+            .map_err(|err| format!("invalid network bind address: {err}"))?;
+        let seed = [1u8; 32];
+        let secret_key = SecretKey::from_seed(&seed)
+            .map_err(|err| format!("failed to build deterministic secret key: {err}"))?;
+        let public_key = secret_key.public_key();
+        let adnl = AdnlTransportNode::bind(secret_key, addr)
+            .await
+            .map_err(|err| format!("failed to bind ADNL transport: {err}"))?;
+        let _public = public_key;
+        let dht = DhtDaemon::new(public_key, Arc::new(NullDhtTransport));
+        let _ = dht;
+
+        let shard = ShardIdent::root(WorkchainIdent::BASIC);
+        let exec_context = ExecutionContext {
+            gen_utime: 0,
+            start_lt: 0,
+            end_lt: 1,
+            gas_limit: 1_000_000,
+        };
+        let _ = exec_context;
+
+        let validator_entries = vec![ValidatorSetEntry {
+            validator_id: 0,
+            public_key,
+            actual_stake: Uint64::from(1),
+        }];
+        let engine = ConsensusEngine::new(
+            shard,
+            0,
+            validator_entries,
+            0,
+            RoundTimeouts::default(),
+        )
+        .map_err(|err| format!("failed to initialize consensus engine: {err}"))?;
+        let _ = engine;
+
+        let _rldp = RldpSender::new(
+            Uint256([0u8; 32]),
+            &[0u8; 1],
+            RldpConfig::default(),
+        )
+        .map_err(|err| format!("failed to initialize RLDP sender: {err}"))?;
+
+        let handle = tokio::spawn(async move {
+            let mut ticker = interval(Duration::from_millis(10));
+            let _ = &adnl;
+            let _ = &dht;
+=======
         let _ = (bind, role, peers);
 
         let handle = tokio::spawn(async move {
             let mut ticker = interval(Duration::from_millis(10));
+>>>>>>> origin/main
             loop {
                 ticker.tick().await;
                 let _ = "network-loop";

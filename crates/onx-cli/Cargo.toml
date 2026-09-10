@@ -1,0 +1,25 @@
+[package]
+name = "onx-cli"
+version = "0.1.0"
+edition = "2021"
+description = "Deterministic ONX CLI wallet and contract command scaffold."
+license = "Apache-2.0"
+publish = false
+
+[[bin]]
+name = "onx-cli"
+path = "src/main.rs"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+clap = { version = "4", features = ["derive"] }
+hex = "0.4"
+rand = "0.8"
+sha2 = "0.9"
+thiserror = "1"
+tokio = { version = "1.38", features = ["full"] }
+onx-primitives = { path = "../onx-primitives" }
+onx-data-structures = { path = "../onx-data-structures" }
+onx-state-model = { path = "../onx-state-model" }
+onx-transactions = { path = "../onx-transactions" }

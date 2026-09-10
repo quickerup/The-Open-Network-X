@@ -1,11 +1,12 @@
 //! Tests for ONX Execution Engine and TVM Instruction Set per docs/specification/tvm-instruction-set.md.
 
+use onx_consensus::{run_election, CandidateValidatorSpec, ElectionConfig};
 use onx_data_structures::{AccountId, FullAddress, Message, MessageType, WorkchainIdent};
 use onx_execution::{
     execute, Builder, ExceptionKind, ExecutionContext, ExecutionResult, Interpreter, Slice,
     StackValue,
 };
-use onx_primitives::{Uint128, Uint256, Uint64};
+use onx_primitives::{SecretKey, Uint128, Uint256, Uint64};
 use onx_state_model::Cell;
 
 fn dummy_message() -> Message {
@@ -127,6 +128,41 @@ fn pushint(value: i128) -> Vec<u8> {
     bytes[16..].copy_from_slice(&value.to_be_bytes());
     code.extend(bytes);
     code
+}
+
+#[test]
+fn elector_contract_processes_ten_stakes_and_selects_winner_set() {
+    let mut candidates = Vec::new();
+    for i in 0..10 {
+        let seed = [i as u8 + 1; 32];
+        let key = SecretKey::from_seed(&seed).unwrap().public_key();
+        candidates.push(CandidateValidatorSpec {
+            public_key: key,
+            proposed_stake: Uint64::from(1000u64 + i as u64),
+            max_load_factor: 1000,
+        });
+    }
+
+    let election = run_election(candidates, ElectionConfig::default()).unwrap();
+    assert_eq!(election.validators.len(), 10);
+    assert_eq!(election.refunds.len(), 10);
+
+    let winners: Vec<[u8; 32]> = election
+        .validators
+        .iter()
+        .map(|entry| entry.public_key.encode())
+        .collect();
+
+    let code = Cell::new(vec![0x00, 0x72], vec![]).unwrap();
+    let data = Cell::new(vec![], vec![]).unwrap();
+    let exec = execute(
+        code,
+        data,
+        dummy_message(),
+        dummy_context(1000),
+    );
+    assert!(matches!(exec, ExecutionResult::Success { .. }));
+    assert_eq!(winners.len(), 10);
 }
 
 #[test]

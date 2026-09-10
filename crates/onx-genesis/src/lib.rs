@@ -1,6 +1,7 @@
 use serde::Deserialize;
+use std::env;
 use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::{Component, Path, PathBuf};
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct Balance {
@@ -50,6 +51,47 @@ impl Default for GenesisConfig {
     }
 }
 
+pub fn secure_output_dir(output: impl AsRef<Path>) -> Result<PathBuf, String> {
+    let out = output.as_ref();
+    if out.is_absolute() {
+        return Err("onx-genesis failed: --out must be a relative path within the current directory".to_string());
+    }
+
+    for comp in out.components() {
+        match comp {
+            Component::RootDir | Component::Prefix(_) | Component::ParentDir => {
+                return Err("onx-genesis failed: --out path must not contain parent, root, or absolute path components".to_string())
+            }
+            _ => {}
+        }
+    }
+
+    let root = env::current_dir().map_err(|err| format!("onx-genesis failed: could not determine current directory: {err}"))?;
+    let mut out_path = root.clone();
+    for comp in out.components() {
+        match comp {
+            Component::CurDir => {}
+            Component::Normal(part) => out_path.push(part),
+            Component::ParentDir | Component::RootDir | Component::Prefix(_) => {
+                return Err("onx-genesis failed: --out path must not contain parent, root, or absolute path components".to_string())
+            }
+        }
+    }
+
+    fs::create_dir_all(&out_path)
+        .map_err(|err| format!("onx-genesis failed: could not create output directory: {err}"))?;
+
+    let root_canon = fs::canonicalize(&root)
+        .map_err(|err| format!("onx-genesis failed: could not canonicalize root: {err}"))?;
+    let out_canon = fs::canonicalize(&out_path)
+        .map_err(|err| format!("onx-genesis failed: could not canonicalize output directory: {err}"))?;
+
+    if !out_canon.starts_with(&root_canon) {
+        return Err("onx-genesis failed: output directory must be within the current directory".to_string());
+    }
+
+    Ok(out_canon)
+}
 pub fn parse_config(path: impl AsRef<Path>) -> Result<GenesisConfig, String> {
     let raw = fs::read_to_string(path.as_ref())
         .map_err(|err| format!("failed to read genesis config {}: {err}", path.as_ref().display()))?;
@@ -106,4 +148,26 @@ pub fn write_docs(output_dir: PathBuf) -> Result<(), String> {
     let doc = "# Launch Guide\n\nThis repository ships a deterministic `onx-genesis` bootstrap generator.\n\nUse `onx-genesis --config genesis.toml --out target/onx-genesis` to create `genesis.boc` and four `node-*.toml` files.\n\nThen launch four `onxd` boot nodes from the same generated `genesis.boc` by pointing each node at its generated configuration file, verifying that the first committed masterchain block is `#0` and that a shared shard header bootstrap path is emitted.\n";
     fs::write(output_dir.join("launch_guide.md"), doc).map_err(|err| err.to_string())?;
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::secure_output_dir;
+    use std::env;
+    use std::path::Path;
+
+    #[test]
+    fn secure_output_dir_rejects_parent_components() {
+        let result = secure_output_dir(Path::new("../../escape"));
+        assert!(result.is_err(), "expected traversal path to be rejected");
+    }
+
+    #[test]
+    fn secure_output_dir_accepts_relative_path_inside_workspace() {
+        let cwd = env::current_dir().unwrap();
+        let result = secure_output_dir(Path::new("target/onx-genesis-test"));
+        assert!(result.is_ok(), "expected safe relative path to be accepted");
+        let out = result.unwrap();
+        assert!(out.starts_with(cwd));
+    }
 }

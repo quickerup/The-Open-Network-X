@@ -14,3 +14,4 @@ onx-transactions = { path = "../onx-transactions" }
 
 [dev-dependencies]
 hex = "0.4"
+onx-consensus = { path = "../onx-consensus" }

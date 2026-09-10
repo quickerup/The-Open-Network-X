@@ -1,0 +1,14 @@
+version: "3.9"
+services:
+  node-0:
+    image: alpine:3.20
+    command: ["sh", "-c", "echo node-0 ready && sleep 30"]
+  node-1:
+    image: alpine:3.20
+    command: ["sh", "-c", "echo node-1 ready && sleep 30"]
+  node-2:
+    image: alpine:3.20
+    command: ["sh", "-c", "echo node-2 ready && sleep 30"]
+  node-3:
+    image: alpine:3.20
+    command: ["sh", "-c", "echo node-3 ready && sleep 30"]

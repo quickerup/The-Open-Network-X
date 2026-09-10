@@ -6,9 +6,20 @@ description = "ONX node daemon bootstrap: config parsing, role selection, storag
 license = "Apache-2.0"
 publish = false
 
+[[bin]]
+name = "onxd"
+path = "src/main.rs"
+
 [dependencies]
 tokio = { version = "1.38", features = ["full"] }
 onx-telemetry = { path = "../onx-telemetry" }
+onx-state-model = { path = "../onx-state-model" }
+onx-execution = { path = "../onx-execution" }
+onx-consensus = { path = "../onx-consensus" }
+onx-networking = { path = "../onx-networking" }
+onx-transactions = { path = "../onx-transactions" }
+onx-data-structures = { path = "../onx-data-structures" }
+onx-primitives = { path = "../onx-primitives" }
 
 [dev-dependencies]
 tokio = { version = "1.38", features = ["full"] }

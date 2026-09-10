@@ -12,11 +12,10 @@ members = [
     "crates/onx-networking",
     "crates/onx-sharding",
     "crates/onx-economics",
+    "crates/onx-telemetry",
     "crates/onxd",
+    "crates/onx-genesis",
     "crates/onx-rpc",
     "crates/onx-cli",
-    "crates/onx-telemetry",
-    "crates/onx-genesis",
-    "tests/simulation",
 ]
 exclude = ["fuzz"]

@@ -40,6 +40,8 @@ impl fmt::Display for ChannelError {
 
 impl std::error::Error for ChannelError {}
 
+pub mod daemon;
+
 /// Payment channel state record per docs/specification/payment-channels.md §4.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ChannelState {
