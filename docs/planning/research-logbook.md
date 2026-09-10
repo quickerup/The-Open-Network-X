@@ -118,3 +118,11 @@ Coverage-guided fuzzing for ONX must treat parser and virtual-machine outcomes a
 
 #### [QUESTION]
 Which minimum corpus and time budget should ONX require for scheduled long-running fuzz jobs beyond the pull-request regression runs, so that coverage growth is measurable without making ordinary contributor CI impractically slow?
+
+### Entry #12
+
+#### [ANSWER]
+Scheduled fuzzing should publish a per-target corpus snapshot and run each target for a fixed wall-clock budget outside contributor CI, with the budget and corpus revision recorded in the workflow output. The pull-request regression run should remain finite and short, while a scheduled job can compare coverage and unique-crash counts against the previous snapshot without making ordinary validation depend on machine speed or an open-ended iteration count.
+
+#### [QUESTION]
+When reorganizing the workspace into protocol, node, and tooling tiers, should CI enforce dependency-direction rules explicitly, or is Cargo's acyclic package graph sufficient for the first implementation milestone?
