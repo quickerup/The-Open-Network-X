@@ -357,3 +357,11 @@ Automated log of commits tracked against whitepaper.md.
   - tests/simulation/run_simulation.py
   - tests/simulation/simulation_report.json
 
+## Commit efa449f064cd5bd059395682bac604b5231ebe9c
+
+- **Timestamp:** 2026-09-10T08:13:58Z
+- **Event:** push
+- **Modified files:**
+  - crates/onxd/src/lib.rs
+  - tests/simulation/run_simulation.py
+
