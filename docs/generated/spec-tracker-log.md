@@ -574,3 +574,12 @@ Automated log of commits tracked against WHITEPAPER.md.
   - crates/tooling/onx-genesis/tests/genesis_tests.rs
   - deny.toml
 
+## Commit c183ca1758b780a65e3bcfa2fd49c028c9c3f58e
+
+- **Timestamp:** 2026-09-10T10:04:51Z
+- **Event:** push
+- **Modified files:**
+  - crates/node/onxd/src/lib.rs
+  - crates/tooling/onx-genesis/src/lib.rs
+  - crates/tooling/onx-genesis/tests/genesis_tests.rs
+
