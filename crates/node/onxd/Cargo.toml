@@ -1,0 +1,25 @@
+[package]
+name = "onxd"
+version = "0.1.0"
+edition = "2021"
+description = "ONX node daemon bootstrap: config parsing, role selection, storage, consensus, execution, networking, and transaction routing summary."
+license = "Apache-2.0"
+publish = false
+
+[[bin]]
+name = "onxd"
+path = "src/main.rs"
+
+[dependencies]
+tokio = { version = "1.38", features = ["full"] }
+onx-telemetry = { path = "../onx-telemetry" }
+onx-state-model = { path = "../../protocol/onx-state-model" }
+onx-execution = { path = "../../protocol/onx-execution" }
+onx-consensus = { path = "../../protocol/onx-consensus" }
+onx-networking = { path = "../onx-networking" }
+onx-transactions = { path = "../../protocol/onx-transactions" }
+onx-data-structures = { path = "../../protocol/onx-data-structures" }
+onx-primitives = { path = "../../protocol/onx-primitives" }
+
+[dev-dependencies]
+tokio = { version = "1.38", features = ["full"] }

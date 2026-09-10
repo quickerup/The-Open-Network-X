@@ -34,7 +34,7 @@ nondeterministic runtime behavior.
 
 ONX's node implementation and protocol libraries are written in **Rust**
 (2021 edition), organized as a Cargo workspace at the repository root. The
-first crate, `crates/onx-primitives`, implements
+first crate, `crates/protocol/onx-primitives`, implements
 `docs/specification/protocol-primitives.md`.
 
 Initial dependencies, chosen for being widely reviewed, standard
@@ -88,11 +88,11 @@ code (`INSTRUCTIONS.md` §10).
 ## Implementation
 
 - `Cargo.toml` (workspace root).
-- `crates/onx-primitives/` implementing `docs/specification/protocol-primitives.md`.
+- `crates/protocol/onx-primitives/` implementing `docs/specification/protocol-primitives.md`.
 
 ## Tests
 
-- `crates/onx-primitives/tests/vectors.rs` implements the test plan in
+- `crates/protocol/onx-primitives/tests/vectors.rs` implements the test plan in
   `docs/specification/protocol-primitives.md` §6: integer boundary vectors,
   NIST SHA-256 vectors, RFC 8032 Ed25519 vectors, domain-separation
   collision tests, and adversarial truncated/trailing/non-canonical input

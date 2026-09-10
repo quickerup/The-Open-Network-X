@@ -70,7 +70,7 @@ Rejected. Allowing general datagrams on the zero-channel would expose applicatio
 
 - `docs/specification/networking-adnl.md` defines the formal protocol rules and packet encodings.
 - No code changes are made in this specification step (specifications precede implementation per ONX guidelines).
-- Future implementation work: a `crates/onx-networking` crate implementing ADNL packet framing, AES/Ed25519 transport encryption, and RLDP FEC chunking.
+- Future implementation work: a `crates/node/onx-networking` crate implementing ADNL packet framing, AES/Ed25519 transport encryption, and RLDP FEC chunking.
 
 ## Tests
 

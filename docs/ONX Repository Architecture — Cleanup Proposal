@@ -1,0 +1,350 @@
+# ONX Repository Architecture — Cleanup Proposal
+
+This is based on a full inspection of `quickerup/The-Open-Network-X`: every
+file's contents, every `Cargo.toml`'s dependency graph, every CI workflow,
+and every cross-reference between docs, scripts, and code. It's organized as:
+what's already right, what's actually wrong (with evidence), the proposed
+tree, and the exact edits each move requires.
+
+## 1. What's already right — keep this
+
+Before proposing changes, it's worth being precise about what *isn't* broken,
+so the changes below read as targeted fixes rather than a rewrite for its
+own sake:
+
+- **The crate dependency graph is clean and acyclic.** `onx-primitives` sits
+  at the bottom with zero internal deps; `onx-data-structures` depends only
+  on it; `onx-state-model`, `onx-transactions`, `onx-blocks` build on those;
+  `onx-execution`, `onx-consensus`, `onx-sharding`, `onx-economics`,
+  `onx-payment-channels` sit above that; `onxd`/`onx-rpc`/`onx-cli` consume
+  the stack. No circular `path` dependencies anywhere.
+- **`docs/specification/` and `docs/decisions/`** are already exactly what
+  they should be: one file per protocol domain, consistent kebab-case
+  naming, a clean sequential `ADR-NNNN-title.md` scheme (0001–0020), and
+  `INSTRUCTIONS.md` §4 literally prescribes this layout. Don't touch these.
+- **Per-crate layout is idiomatic Rust**: flat `src/`, a `tests/` integration
+  directory, a scoped `Cargo.toml`. No crate reaches into another crate's
+  internals.
+- **`fuzz/`** follows the standard `cargo-fuzz` convention exactly. Leave it.
+
+## 2. Findings — concrete problems
+
+### 2.1 `contracts/system/*.rs` isn't part of the workspace
+
+`contracts/` has no `Cargo.toml` and isn't in `Cargo.toml`'s `members` list,
+so `config.rs`, `elector.rs`, and `storage.rs` never compile, lint, or run in
+CI — `cargo build --workspace` silently skips them. Worse, `elector.rs`
+`use`s `onx_consensus` and `onx_primitives` as if it were a real crate, so it
+*looks* wired in but isn't.
+
+This orphan status also produces a fragile cross-cutting reference:
+`crates/onx-execution/tests/contracts/elector_run.rs` reads the sibling
+`.tvm` file via
+```rust
+Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../contracts/system/elector.tvm")
+```
+— a three-parent relative climb from inside one crate's test suite, out of
+`crates/`, into an uncompiled top-level directory. That path breaks the
+moment either directory moves, and nothing in the type system enforces it.
+
+**Fix:** make `contracts/system` a real workspace member with its own
+`Cargo.toml`, so the Rust adapters compile and the `.tvm` fixtures are
+reached through the crate's own `CARGO_MANIFEST_DIR`, not a guessed relative
+path from a different crate.
+
+### 2.2 A generated test report is committed to git
+
+`tests/simulation/run_simulation.py --out` defaults to
+`tests/simulation/simulation_report.json`, and `ci.yml` runs that script on
+every push/PR without overriding `--out`. The file in the repo right now
+(`elapsed_seconds: 0.536859`, etc.) is a timestamped run output, not a
+fixture — every CI run regenerates it with different numbers, and
+`.gitignore` only excludes `/target`, so it shows up as a dirty/changed file
+forever.
+
+**Fix:** default the script's output into `target/` (already gitignored)
+and remove the tracked JSON file.
+
+### 2.3 The README's own "Repository structure" section is stale
+
+`README.md`'s documented tree lists **11 crates**; the workspace actually has
+**16** (`onx-telemetry`, `onxd`, `onx-genesis`, `onx-rpc`, `onx-cli` are
+missing from the doc). It also omits `contracts/`, `fuzz/`, `tests/`,
+`scripts/`, `.github/`, and root files `ROADMAP.md`, `LICENSE`,
+`CONTRIBUTING.md`, `Cargo.lock`, `deny.toml`, `rust-toolchain.toml`,
+`genesis.toml`. For a project whose own `INSTRUCTIONS.md` treats
+documentation as part of the protocol, the single most-referenced structural
+diagram in the repo is about a third accurate.
+
+**Fix:** regenerate that section to match reality (done below), and treat it
+as something CI checks rather than hand-maintains, if that's feasible later.
+
+### 2.4 Two same-purpose-sounding, differently-cased docs sit side by side
+
+`docs/RESEARCH_LOGBOOK.md` (SCREAMING_SNAKE, hand-authored Q&A chain every PR
+must extend — enforced by `scripts/check_research_logbook.py`) and
+`docs/research_log.md` (snake_case, bot-appended commit log written by
+`.github/workflows/spec-tracker.yml`) are unrelated mechanisms that happen to
+have near-identical names in the same folder. Anyone skimming `docs/`
+reasonably assumes these are duplicates.
+
+**Fix:** separate them by folder *and* name — one is a planning artifact
+humans write, the other is CI-generated telemetry.
+
+### 2.5 `docs/` mixes five different kinds of content flatly
+
+Right now `docs/` directly contains: protocol specs (`specification/`),
+ADRs (`decisions/`), a contribution ritual (`RESEARCH_LOGBOOK.md`), a
+bot-generated log (`research_log.md`), a task backlog
+(`development-tasks.md`), an operational runbook (`launch_guide.md`), and a
+one-off audit note about whitepaper formatting
+(`whitepaper-page-header-review.md`). The two subfolders that exist
+(`specification/`, `decisions/`) are excellent; everything else is loose.
+
+### 2.6 Naming convention drift in `scripts/`
+
+`check-spec-citations.py` (kebab-case) sits next to
+`check_research_logbook.py` and `fix_whitepaper_page_headers.py`
+(snake_case) — three scripts, two conventions, no reason for the split.
+
+### 2.7 A non-workflow config file lives inside `workflows/`
+
+`.github/workflows/mlc_config.json` is markdown-link-checker configuration,
+not a workflow definition. `docs-lint.yml` references it by path, but its
+neighbors are all `*.yml` GitHub Actions files.
+
+### 2.8 `ROADMAP.md` and its detailed companion live in different places
+
+`ROADMAP.md` (root) opens by pointing to `docs/development-tasks.md` for the
+detailed 20-task breakdown. They're two halves of one planning document, one
+at root and one two directories deep, for no structural reason.
+
+### 2.9 (Dependency note, not a location issue) `onx-genesis` has no internal deps
+
+Worth flagging even though it doesn't change any file's *location*:
+`crates/onx-genesis` depends on nothing in the workspace — it parses
+addresses and keys as raw `String`s via `serde` rather than using
+`onx-primitives`/`onx-data-structures` types. That's a coupling gap the
+directory reshuffle below won't fix by itself; it's a follow-up for whoever
+next touches genesis generation.
+
+## 3. Proposed tree
+
+```
+The-Open-Network-X/
+├── .github/
+│   ├── CODEOWNERS
+│   ├── PULL_REQUEST_TEMPLATE.md
+│   ├── dependabot.yml
+│   ├── labeler.yml
+│   ├── mlc_config.json                      # moved up out of workflows/
+│   └── workflows/
+│       ├── actionlint.yml
+│       ├── ci.yml
+│       ├── codeql.yml
+│       ├── coverage.yml
+│       ├── deny.yml
+│       ├── docs-lint.yml
+│       ├── fuzz-regression.yml
+│       ├── issue-on-failure.yml
+│       ├── labeler.yml
+│       ├── release.yml
+│       ├── research-logbook.yml
+│       ├── spec-tracker.yml
+│       ├── spelling.yml
+│       └── stale.yml
+├── .gitignore
+├── .typos.toml
+├── Cargo.lock
+├── Cargo.toml
+├── CONTRIBUTING.md
+├── INSTRUCTIONS.md
+├── LICENSE
+├── README.md
+├── ROADMAP.md
+├── whitepaper.md                            # stays at root — see §4
+├── rust-toolchain.toml
+├── deny.toml
+├── config/
+│   └── genesis.toml                         # moved from root
+├── contracts/
+│   └── system/
+│       ├── Cargo.toml                       # NEW — makes this a real crate
+│       ├── README.md
+│       ├── src/
+│       │   ├── lib.rs                       # NEW — re-exports the three modules
+│       │   ├── config.rs
+│       │   ├── elector.rs
+│       │   └── storage.rs
+│       └── bytecode/
+│           ├── config.tvm
+│           └── elector.tvm
+├── crates/
+│   ├── protocol/                            # consensus-critical, no I/O
+│   │   ├── onx-primitives/
+│   │   │   ├── Cargo.toml
+│   │   │   ├── src/
+│   │   │   │   ├── bytes.rs
+│   │   │   │   ├── error.rs
+│   │   │   │   ├── hash.rs
+│   │   │   │   ├── integers.rs
+│   │   │   │   ├── lib.rs
+│   │   │   │   └── signature.rs
+│   │   │   └── tests/vectors.rs
+│   │   ├── onx-data-structures/
+│   │   │   ├── Cargo.toml
+│   │   │   ├── src/{address,block,error,lib,message,shard}.rs
+│   │   │   └── tests/data_structures_tests.rs
+│   │   ├── onx-state-model/
+│   │   │   ├── Cargo.toml
+│   │   │   ├── src/{account,boc,cell,error,lib,storage,tree}.rs
+│   │   │   └── tests/{property_tests,state_model_tests,storage_tests}.rs
+│   │   ├── onx-transactions/
+│   │   │   ├── Cargo.toml
+│   │   │   ├── src/{admission,error,lib,output_queue,processed,router}.rs
+│   │   │   └── tests/transactions_tests.rs
+│   │   ├── onx-blocks/
+│   │   │   ├── Cargo.toml
+│   │   │   ├── src/{error,flags,lib,masterchain,sync,validity}.rs
+│   │   │   └── tests/{blocks_tests,sync_tests}.rs
+│   │   ├── onx-execution/
+│   │   │   ├── Cargo.toml
+│   │   │   ├── src/{continuation,dictionary,interpreter,lib,types}.rs
+│   │   │   └── tests/
+│   │   │       ├── execution_tests.rs
+│   │   │       └── elector_contract_execution.rs   # flattened, see §4
+│   │   ├── onx-consensus/
+│   │   │   ├── Cargo.toml
+│   │   │   ├── src/{election,engine,lib}.rs
+│   │   │   └── tests/{consensus_tests,engine_integration}.rs
+│   │   ├── onx-sharding/
+│   │   │   ├── Cargo.toml
+│   │   │   ├── src/{lib,pipeline}.rs
+│   │   │   └── tests/sharding_tests.rs
+│   │   ├── onx-economics/
+│   │   │   ├── Cargo.toml
+│   │   │   ├── src/{lib,slashing}.rs
+│   │   │   └── tests/economics_tests.rs
+│   │   └── onx-payment-channels/
+│   │       ├── Cargo.toml
+│   │       ├── src/{daemon,lib}.rs
+│   │       └── tests/{daemon_flow_tests,payment_channels_tests}.rs
+│   ├── node/                                # runtime/service layer
+│   │   ├── onx-networking/
+│   │   │   ├── Cargo.toml
+│   │   │   ├── src/{adnl_transport,dht_daemon,lib,rldp}.rs
+│   │   │   └── tests/{adnl_loopback,networking_tests,rldp_lossy}.rs
+│   │   ├── onx-telemetry/
+│   │   │   ├── Cargo.toml
+│   │   │   └── src/lib.rs
+│   │   ├── onx-rpc/
+│   │   │   ├── Cargo.toml
+│   │   │   └── src/lib.rs
+│   │   └── onxd/
+│   │       ├── Cargo.toml
+│   │       └── src/{lib,main}.rs
+│   └── tooling/                             # developer-facing binaries
+│       ├── onx-cli/
+│       │   ├── Cargo.toml
+│       │   └── src/{lib,main}.rs
+│       └── onx-genesis/
+│           ├── Cargo.toml
+│           ├── src/{lib,main}.rs
+│           └── tests/genesis_tests.rs
+├── docs/
+│   ├── specification/                       # unchanged (15 files)
+│   ├── decisions/                           # unchanged (ADR-0001..0020)
+│   ├── planning/
+│   │   ├── research-logbook.md              # was RESEARCH_LOGBOOK.md
+│   │   └── development-tasks.md             # was docs/development-tasks.md
+│   ├── guides/
+│   │   └── local-network-launch.md          # was docs/launch_guide.md
+│   ├── generated/
+│   │   └── spec-tracker-log.md              # was docs/research_log.md
+│   └── reference/
+│       └── whitepaper-page-header-review.md # was docs/whitepaper-page-header-review.md
+├── fuzz/
+│   ├── Cargo.toml                           # path deps updated, see §5
+│   ├── README.md
+│   └── fuzz_targets/{block_header,boc_parser,tvm_execution}.rs
+├── scripts/
+│   ├── README.md
+│   ├── check-spec-citations.py
+│   ├── check-research-logbook.py            # was check_research_logbook.py
+│   └── fix-whitepaper-page-headers.py       # was fix_whitepaper_page_headers.py
+└── tests/
+    └── simulation/
+        ├── README.md
+        ├── docker-compose.yml
+        └── run_simulation.py                # --out now defaults under target/
+                                              # (simulation_report.json removed from git)
+```
+
+## 4. What I deliberately left alone, and why
+
+- **`whitepaper.md` stays at the repo root.** It's tempting to tuck it into
+  `docs/reference/`, but it's cited by short filename (`whitepaper.md §2.1`)
+  across all 15 specification docs and most ADRs — about 30 files in total.
+  Only three things actually *open* it by path
+  (`scripts/check-spec-citations.py`, `scripts/fix-whitepaper-page-headers.py`,
+  and the `spec-tracker.yml` existence assertion), so moving it is cheap in
+  functional terms but would either leave 30 files' citation keys pointing
+  at a filename that no longer matches the physical path, or require
+  touching all of them for a purely cosmetic gain. Treat it like `LICENSE`:
+  a root-level, unmodified reference artifact is the right call here.
+- **`docs/specification/` and `docs/decisions/` are untouched** — see §1.
+- **`fuzz/`'s internal layout is untouched** — it already follows the
+  `cargo-fuzz` convention; only its three `path` dependencies need editing
+  because the crates they point at are moving (§5).
+- **I did not invent a `docs/README.md` index or similar** — the existing
+  README's structure section, corrected, already serves that purpose.
+
+## 5. Exact moves and the edits each one requires
+
+| # | Old path | New path | Files that must be edited |
+|---|---|---|---|
+| 1 | `contracts/system/{config,elector,storage}.rs` | `contracts/system/src/{config,elector,storage}.rs` | none (internal move); add new `contracts/system/Cargo.toml` + `src/lib.rs`; add `"contracts/system"` to root `Cargo.toml` `members` |
+| 2 | `contracts/system/{config,elector}.tvm` | `contracts/system/bytecode/{config,elector}.tvm` | `contracts/system/README.md` (path mentions) |
+| 3 | `crates/onx-execution/tests/contracts/elector_run.rs` | `crates/protocol/onx-execution/tests/elector_contract_execution.rs` | rewrite the `../../../contracts/system/elector.tvm` climb to use a fixture path exposed by the new `onx-system-contracts` crate (add it as a `[dev-dependencies]` entry) |
+| 4 | `tests/simulation/simulation_report.json` | *(deleted from git)* | `tests/simulation/run_simulation.py` (`--out` default → `target/simulation/simulation_report.json`) |
+| 5 | `genesis.toml` | `config/genesis.toml` | `crates/tooling/onx-genesis/src/main.rs` (default arg), `crates/tooling/onx-genesis/src/lib.rs` (embedded doc string), `docs/guides/local-network-launch.md` (example command) |
+| 6 | `.github/workflows/mlc_config.json` | `.github/mlc_config.json` | `.github/workflows/docs-lint.yml` (`config-file:` value) |
+| 7 | `docs/RESEARCH_LOGBOOK.md` | `docs/planning/research-logbook.md` | `scripts/check-research-logbook.py` (`LOGBOOK_PATH` constant), `CONTRIBUTING.md`, `docs/planning/development-tasks.md` |
+| 8 | `docs/research_log.md` | `docs/generated/spec-tracker-log.md` | `.github/workflows/spec-tracker.yml` (6 path occurrences) |
+| 9 | `docs/development-tasks.md` | `docs/planning/development-tasks.md` | `README.md`, `ROADMAP.md` |
+| 10 | `docs/launch_guide.md` | `docs/guides/local-network-launch.md` | `docs/planning/development-tasks.md` |
+| 11 | `docs/whitepaper-page-header-review.md` | `docs/reference/whitepaper-page-header-review.md` | `.typos.toml` (`extend-exclude` entry), `scripts/README.md` |
+| 12 | `scripts/check_research_logbook.py` | `scripts/check-research-logbook.py` | `.github/workflows/research-logbook.yml` (`run:` line) |
+| 13 | `scripts/fix_whitepaper_page_headers.py` | `scripts/fix-whitepaper-page-headers.py` | `scripts/README.md` (2 mentions) |
+| 14 | `crates/onx-*` (10 protocol crates) | `crates/protocol/onx-*` | root `Cargo.toml` `members`; **no internal `path = "../onx-x"` edits needed** — every dependency between these ten crates is to another crate in the same tier, so the sibling-relative paths are unchanged |
+| 15 | `crates/onx-networking`, `onx-telemetry`, `onx-rpc`, `onxd` | `crates/node/onx-*` | root `Cargo.toml` `members`; `onx-networking/Cargo.toml`, `onx-rpc/Cargo.toml`, `onxd/Cargo.toml` need their protocol-crate `path`s changed from `../onx-x` to `../../protocol/onx-x` (their dependencies *on each other*, e.g. `onxd` → `onx-networking`, stay same-tier and unchanged) |
+| 16 | `crates/onx-cli`, `onx-genesis` | `crates/tooling/onx-*` | root `Cargo.toml` `members`; `onx-cli/Cargo.toml` needs its four protocol-crate `path`s changed to `../../protocol/onx-x` |
+| 17 | *(fuzz crate, not moved)* | — | `fuzz/Cargo.toml`: all six `path = "../crates/onx-x"` entries become `path = "../crates/protocol/onx-x"` |
+
+Two mechanical notes that apply across the table: `Cargo.lock` regenerates
+itself on the next `cargo build`, no manual edit needed; and CI/labeler
+globs (`crates/**` in `fuzz-regression.yml` and `.github/labeler.yml`)
+already match any depth, so those two files need no change despite the
+crate moves.
+
+## 6. Suggested phasing
+
+**Phase 1 — cheap, zero ambiguity, do first**
+Items 4, 6, 12, 13 above, plus rewriting the README's "Repository structure"
+section to match reality (§2.3). Nothing here touches Cargo dependency
+paths, so it can't break a build.
+
+**Phase 2 — moderate, mostly docs**
+Items 2, 5, 7, 8, 9, 10, 11: the `docs/` reshuffle and `genesis.toml` move.
+Each is a handful of grep-and-replace edits per the table above.
+
+**Phase 3 — the real architectural change, do deliberately**
+Making `contracts/system` a real crate (items 1, 3) and splitting `crates/`
+into `protocol/` / `node/` / `tooling/` (items 14–17). This is the one part
+of this proposal that's a judgment call rather than a fix for something
+broken — the current flat `crates/` layout isn't wrong, just less
+self-explanatory as the workspace grows past 16 members. It's also the part
+with the widest *prose* footprint: roughly a dozen ADRs, `ROADMAP.md`, and
+`CONTRIBUTING.md` reference `crates/onx-*` paths in running text, and those
+would go stale (a broken doc link, not a broken build) until touched up.
+Worth doing, but as its own PR, not bundled with Phase 1/2.

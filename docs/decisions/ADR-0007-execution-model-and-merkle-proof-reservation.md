@@ -57,7 +57,7 @@ Rejected. Neither `WHITEPAPER.md` nor any ONX document provides an opcode-level 
 
 - `docs/specification/execution.md` defines the formal execution contract, required semantic categories, and exception set.
 - No code changes in this ADR (specification only, per project convention of spec before implementation).
-- Future implementation work: a "TVM Instruction Set" specification/ADR defining concrete opcodes and gas prices, followed by a `crates/onx-execution` (or similar) crate implementing both this document and that one.
+- Future implementation work: a "TVM Instruction Set" specification/ADR defining concrete opcodes and gas prices, followed by a `crates/protocol/onx-execution` crate implementing both this document and that one.
 
 ## Tests
 

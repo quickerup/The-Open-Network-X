@@ -46,7 +46,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--latency-ms", type=int, default=50)
     parser.add_argument("--bandwidth-mbps", type=int, default=1000)
     parser.add_argument("--drop-pct", type=float, default=0.0)
-    parser.add_argument("--out", default="tests/simulation/simulation_report.json")
+    parser.add_argument("--out", default="target/simulation/simulation_report.json")
     return parser.parse_args()
 
 

@@ -1,0 +1,22 @@
+[package]
+name = "onx-networking"
+version = "0.1.0"
+edition = "2021"
+description = "ONX networking specs: ADNL peer identity & RLDP datagram transport, DHT Kademlia discovery, and overlay network propagation"
+license = "Apache-2.0"
+publish = false
+
+[dependencies]
+onx-primitives = { path = "../../protocol/onx-primitives" }
+onx-data-structures = { path = "../../protocol/onx-data-structures" }
+tokio = { version = "1.38", features = ["net", "rt", "sync", "time", "macros"] }
+aes = "0.8"
+ctr = "0.9"
+rand = "0.8"
+ed25519-dalek = "2.1"
+x25519-dalek = { version = "2.0", features = ["static_secrets"] }
+sha2 = "0.10"
+
+[dev-dependencies]
+hex = "0.4"
+tokio = { version = "1.38", features = ["full"] }

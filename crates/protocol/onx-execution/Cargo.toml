@@ -1,0 +1,18 @@
+[package]
+name = "onx-execution"
+version = "0.1.0"
+edition = "2021"
+description = "ONX execution engine and TVM 46-opcode interpreter per docs/specification/execution.md and docs/specification/tvm-instruction-set.md"
+license = "Apache-2.0"
+publish = false
+
+[dependencies]
+onx-primitives = { path = "../onx-primitives" }
+onx-data-structures = { path = "../onx-data-structures" }
+onx-state-model = { path = "../onx-state-model" }
+onx-transactions = { path = "../onx-transactions" }
+
+[dev-dependencies]
+hex = "0.4"
+onx-consensus = { path = "../onx-consensus" }
+onx-system-contracts = { path = "../../../contracts/system" }

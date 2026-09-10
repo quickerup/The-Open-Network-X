@@ -28,4 +28,4 @@ jobs:
           python-version: '3.x'
 
       - name: Run research logbook check
-        run: python3 scripts/check_research_logbook.py
+        run: python3 scripts/check-research-logbook.py

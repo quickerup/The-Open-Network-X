@@ -63,7 +63,7 @@ Rejected. Requiring all global validators to validate every shardchain block sev
 
 - `docs/specification/consensus.md` defines the normative consensus rules.
 - Resolves open question ONX-ARCH-005 in `docs/specification/architecture.md`.
-- Future code implementation will introduce `crates/onx-consensus` building on `crates/onx-primitives`, `crates/onx-data-structures`, and `crates/onx-state-model`.
+- Future code implementation will introduce `crates/protocol/onx-consensus` building on `crates/protocol/onx-primitives`, `crates/protocol/onx-data-structures`, and `crates/protocol/onx-state-model`.
 
 ## Tests
 

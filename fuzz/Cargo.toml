@@ -9,12 +9,12 @@ cargo-fuzz = true
 
 [dependencies]
 libfuzzer-sys = "0.4"
-onx-blocks = { path = "../crates/onx-blocks" }
-onx-consensus = { path = "../crates/onx-consensus" }
-onx-data-structures = { path = "../crates/onx-data-structures" }
-onx-execution = { path = "../crates/onx-execution" }
-onx-primitives = { path = "../crates/onx-primitives" }
-onx-state-model = { path = "../crates/onx-state-model" }
+onx-blocks = { path = "../crates/protocol/onx-blocks" }
+onx-consensus = { path = "../crates/protocol/onx-consensus" }
+onx-data-structures = { path = "../crates/protocol/onx-data-structures" }
+onx-execution = { path = "../crates/protocol/onx-execution" }
+onx-primitives = { path = "../crates/protocol/onx-primitives" }
+onx-state-model = { path = "../crates/protocol/onx-state-model" }
 
 [[bin]]
 name = "boc_parser"

@@ -22,8 +22,8 @@ The election transition can lock selected actual stakes and return unused or uns
 
 ## Implementation
 
-- `crates/onx-consensus/src/election.rs` implements candidate validation, canonical selection, actual-stake caps, and immediate refunds.
-- `crates/onx-economics/src/slashing.rs` implements slashing outcomes and exact-conservation reward allocation.
+- `crates/protocol/onx-consensus/src/election.rs` implements candidate validation, canonical selection, actual-stake caps, and immediate refunds.
+- `crates/protocol/onx-economics/src/slashing.rs` implements slashing outcomes and exact-conservation reward allocation.
 
 ## Tests
 
